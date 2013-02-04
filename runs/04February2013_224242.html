@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html><head><title>04February2013_224242</title><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script></head><body><h2>04February2013_224242</h2><ul><li><h4>DistributionTest.bug.json</h4><pre>runtime error: 
+/home/tomn/baysig-core/tests/asserts/DistributionTest.js:155
+var eunorm = expect((normal(0)( 1)));
+             ^
+ReferenceError: expect is not defined
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-core/tests/asserts/DistributionTest.js:155:14)
+    at Module._compile (module.js:449:26)
+    at Object.Module._extensions..js (module.js:467:10)
+    at Module.load (module.js:356:32)
+    at Function.Module._load (module.js:312:12)
+    at Module.runMain (module.js:492:10)
+    at process.startup.processNextTick.process._tickCallback (node.js:244:9)
+</pre></li><li><h4>PreludeTests.bug.json</h4><a onclick="$('#PreludeTests').toggle();" href="#">Show/hide code</a><pre id="PreludeTests" style="display: none;">module PreludeTest where
+
+import Prelude.bug
+
+assert_fac3 = fac 3 == 6
+
+assert_pairs0 = 2 == fst (2,3)
+assert_pairs1 = 3 == snd (2,3)
+
+assert_case = case 1 of
+        0 -&gt; False
+        1 -&gt; True
+
+assert_case1 = case 1 of
+        0 -&gt; False
+        _ -&gt; True
+
+assert_case2 = case 1 of
+        0 -&gt; False
+        x -&gt; True
+
+assert_case3 = not $ case 0 of
+        0 -&gt; False
+        x -&gt; True
+
+f x = 2 * x + 1
+
+lst = Cons 5.3 $ Cons 2.1 Nil
+
+nothing_to_see = let &lt;x,y,z&gt; = fillV 3 (\i-&gt; unround i)
+	       	 in ()
+
+--ASSERT_TYPE lst (List Real)
+
+assert_fhead = between 10 12 $ f $ head lst
+
+assert_bool1 = (True &amp;&amp; False) || (True || False)
+
+assert_bool2 = not $ (True &amp;&amp; False) || (True &amp;&amp; False)
+
+assert_cmp = if ((f $ head lst) &gt; 10) then True else False
+
+assert_negative = -5 &lt; 0
+
+assert_length1 = length lst == 2
+
+lst_lit = [6.2, 4.5, 8.9]
+
+assert_length2 = length lst_lit == 3
+
+asset_litlist1 = between 6 7 $ ix 0 lst_lit
+asset_litlist2 = between 8 9 $ ix 2 lst_lit
+
+llpat = let [x,y] = lst
+        in x
+
+assert_list_lit_pattern = between 5 6 llpat
+
+
+
+
+--the mere definition of these makes the test suite loop forever. not good. 
+--commenting out pred-prey code fixes this. 
+--wierd interaction between mutually recursive functions and ODEs
+--FIXME
+
+--myeven 0 = True
+--myeven n =  myodd (n-1)
+
+--myodd 0 = False
+--myodd n = myeven (n-1)
+
+
+
+--simple distributions
+
+fixdist = do
+  x ~ return (4:Int)
+  y ~ return 5
+  return (x + y)
+
+fixdist1 = do
+  x ~ return (4:Int)
+  y ~ return 5
+  w = x + y
+  return (w + y)
+
+nestedDo = do
+  x ~ do 
+    z ~ unit
+    return z
+  return $ x+1
+
+fixdistSam &lt;* sample $ fmap (\w-&gt;w&gt;6) fixdist
+fixdist1Sam &lt;* sample $ fmap (\w-&gt;w&gt;10) fixdist1
+nestedDoSam &lt;* sample $ fmap (\w-&gt;w&gt;1.0) nestedDo
+
+assert_fixdist = fixdistSam
+assert_fixdist1 = fixdist1Sam
+assert_nestedDo = nestedDoSam
+
+
+
+wdist = return ( xr =&gt; 2 )
+
+wdistSam &lt;* sample $ with wdist (between 1 3 xr) 
+assert_with = wdistSam
+
+
+-- records
+
+--ASSERT_TYPE rec1 {foo: Int; bar: String}
+
+rec1 = foo =&gt; (5:Int);bar=&gt;&quot;Hello!&quot;
+
+assert_rec_access1 = rec1#foo &gt; 4
+
+rec2 = baz=&gt;True
+--doesnt work for now: rec2 = rec1;baz=&gt;True or rec2 = baz=&gt;True;rec1
+
+assert_rec_access2= rec2#baz
+
+rec1foo = let {..} = rec1
+	  in foo
+
+assert_rec1_wild = between 4 6 rec1foo
+
+
+--implicit parameters
+
+
+fimpl foo? bar = foo+(bar:Int)
+
+impl_res = let foo = 2
+           in fimpl 5
+
+assert_implicit_params = impl_res == 7
+	 
+</pre><ul><li>assert_fac3: pass</li><li>assert_pairs0: pass</li><li>assert_pairs1: pass</li><li>assert_case: pass</li><li>assert_case1: pass</li><li>assert_case2: pass</li><li>assert_case3: pass</li><li>assert_fhead: pass</li><li>assert_bool1: pass</li><li>assert_bool2: pass</li><li>assert_cmp: pass</li><li>assert_negative: pass</li><li>assert_length1: pass</li><li>assert_length2: pass</li><li>assert_list_lit_pattern: pass</li><li>assert_rec_access1: pass</li><li>assert_rec_access2: pass</li><li>assert_rec1_wild: pass</li><li>assert_implicit_params: pass</li><li>assert_fixdist: pass</li><li>assert_fixdist1: pass</li><li>assert_nestedDo: pass</li><li>assert_with: pass</li></ul></li><li><h4>RecursiveTests.bug.json</h4><a onclick="$('#RecursiveTests').toggle();" href="#">Show/hide code</a><pre id="RecursiveTests" style="display: none;">module RecursiveTests where
+
+import Prelude.bug
+
+
+myeven 0 = True
+myeven n =  myodd (n-1)
+
+myodd 0 = False
+myodd n = myeven (n-1)
+
+myeven1 0 = True
+myeven1 n =  myodd1 (n-1)
+
+myodd1 0 = False
+myodd1 n = myeven1 (n-1)
+
+
+assert_even_4 = myeven 4
+assert_even1_4 = myeven1 4
+assert_odd_5 = myodd 5
+assert_odd1_5 = myodd 5
+assert_noteven_5 = not $ myeven 5
+
+</pre><ul><li>assert_even_4: pass</li><li>assert_even1_4: pass</li><li>assert_odd_5: pass</li><li>assert_odd1_5: pass</li><li>assert_noteven_5: pass</li></ul></li><li><h4>ODETests.bug.json</h4><a onclick="$('#ODETests').toggle();" href="#">Show/hide code</a><pre id="ODETests" style="display: none;">module PreludeTest where
+
+import Prelude.bug
+
+--ODEs
+
+dt = 0.005
+tmax = 1.1
+
+mysig_0 = 1.0
+
+D mysig t = sin (mysig t)
+
+assert_ode = between 1.9 2.0 $ mysig 1.0
+
+rvalpha   = 0.1
+rvbeta    = 0.01
+rvgamma   = 0.05
+rvdelta   = 0.001
+prey_0      = 50.0 
+pred_0      = 15
+D prey t    =     prey t    * (rvalpha  - rvbeta   * pred t) 
+D pred t    =  -  pred t    * (rvgamma  - rvdelta  * prey t)
+
+assert_prey = between 47 48 $ prey 1.0
+assert_pred = between 14.5 15.5 $ pred 1.0
+
+s3 = let zz_0 = 1.0
+         D zz = \t -&gt; sin t
+     in zz
+
+s4 = let v_0 = -0.07
+         w_0 = 0.0
+         D v = \t -&gt; 0.01 * v t -  w t
+         D w = \t -&gt; 0.3 *  w t - v t
+     in v 
+
+assert_let_odes = s4 1.0 &lt; 0 
+</pre><ul><li>assert_ode: pass</li><li>assert_let_odes: pass</li><li>assert_prey: pass</li><li>assert_pred: pass</li></ul></li><li><h4>CSVTest.bug.json</h4><pre>runtime error: 
+/home/tomn/baysig-core/tests/asserts/CSVTest.js:163
+var bp = csvFile(&quot;/home/tomn/baysig-core/tests/auxiliary/table.csv&quot;);
+         ^
+ReferenceError: csvFile is not defined
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-core/tests/asserts/CSVTest.js:163:10)
+    at Module._compile (module.js:449:26)
+    at Object.Module._extensions..js (module.js:467:10)
+    at Module.load (module.js:356:32)
+    at Function.Module._load (module.js:312:12)
+    at Module.runMain (module.js:492:10)
+    at process.startup.processNextTick.process._tickCallback (node.js:244:9)
+</pre></li><li><h4>DensityTests.bug.json</h4><a onclick="$('#DensityTests').toggle();" href="#">Show/hide code</a><pre id="DensityTests" style="display: none;">{-
+TEST_COMPILER_ONLY
+-}
+
+module DensityTests where
+
+import Distributions.bug
+
+assert_normal_sampler_pdf1 = SamplerDensity (normal 0 1) (normalLogPdf 0 1)
+--assert_normal_sampler_pdf3 = SamplerDensity (normal 1 10) (normalLogPdf 1 10)
+--assert_normal_sampler_pdf5 = SamplerDensity (normal 10 1) (normalLogPdf 10 1)
+--assert_unormal_sampler_pdf = SamplerDensity (unormal) (normalLogPdf 0 1)
+
+
+assert_uniform_sampler_pdf1 = SamplerDensity (uniform 5 10) (uniformLogPdf 5 10)
+
+assert_lognormal_pdf = SamplerDensity (logNormal 1 1) (logNormalLogPdf 1 1)
+assert_gamma_pdf1 = SamplerDensity (gamma 1 2.0) (gammaLogPdf 1 2.0)
+assert_gamma_pdf2 = SamplerDensity (gamma 9 0.5) (gammaLogPdf 9 0.5)
+
+assert_invgamma_pdf1 = SamplerDensity (invGamma 1 1)   (invGammaLogPdf 1 1)
+assert_invgamma_pdf2 = SamplerDensity (invGamma 3 0.5) (invGammaLogPdf 3 0.5)
+
+</pre><ul><li>assert_normal_sampler_pdf1: pass</li><li>assert_uniform_sampler_pdf1: pass</li><li>assert_lognormal_pdf: pass</li><li>assert_gamma_pdf1: pass</li><li>assert_gamma_pdf2: pass</li><li>assert_invgamma_pdf1: fail</li><li>assert_invgamma_pdf2: fail</li></ul></li></ul></body></html>
