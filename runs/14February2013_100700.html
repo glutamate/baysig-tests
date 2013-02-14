@@ -1,0 +1,412 @@
+<!DOCTYPE HTML>
+<html><head><title>14February2013_100700</title><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script></head><body><h2>14February2013_100700</h2><table><tr><th>package</th><th>git commit hash</th><th>modified</th></tr><tr><td>baysig-core</td><td>2623a7d7303c35c03a168b9f7f40a24e2ece533c
+</td><td></td></tr><tr><td>bugsess</td><td>221e7fd56fff167f716824bc34adbffed7ede7f6
+</td><td></td></tr><tr><td>baysig-exec</td><td>fb4fbb2c1993fa56e59677dc42072ec8ab8c48a1
+</td><td>Yes</td></tr></table><table><tr><td colspan="3"><h4>DistributionTest</h4></td></tr><tr><td colspan="3"><pre>type error: Undefined variable: decide</pre></td></tr><tr><td><h4>PreludeTests</h4></td><td>84 ms</td><td><a onclick="$('#PreludeTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="PreludeTests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+assert_fac3 = fac 3 == 6
+
+assert_pairs0 = 2 == fst (2,3)
+assert_pairs1 = 3 == snd (2,3)
+
+assert_case = case 1 of
+        0 -&gt; False
+        1 -&gt; True
+
+assert_case1 = case 1 of
+        0 -&gt; False
+        _ -&gt; True
+
+assert_case2 = case 1 of
+        0 -&gt; False
+        x -&gt; True
+
+assert_case3 = not $ case 0 of
+        0 -&gt; False
+        x -&gt; True
+
+f x = 2 * x + 1
+
+lst = Cons 5.3 $ Cons 2.1 Nil
+
+nothing_to_see = let &lt;x,y,z&gt; = fillV 3 (\i-&gt; unround i)
+	       	 in ()
+
+--ASSERT_TYPE lst (List Real)
+
+assert_fhead = between 10 12 $ f $ head lst
+
+assert_bool1 = (True &amp;&amp; False) || (True || False)
+
+assert_bool2 = not $ (True &amp;&amp; False) || (True &amp;&amp; False)
+
+assert_cmp = if ((f $ head lst) &gt; 10) then True else False
+
+assert_negative = -5 &lt; 0
+
+assert_length1 = length lst == 2
+
+lst_lit = [6.2, 4.5, 8.9]
+
+assert_length2 = length lst_lit == 3
+
+asset_litlist1 = between 6 7 $ ix 0 lst_lit
+asset_litlist2 = between 8 9 $ ix 2 lst_lit
+
+llpat = let [x,y] = lst
+        in x
+
+assert_list_lit_pattern = between 5 6 llpat
+
+
+
+
+--the mere definition of these makes the test suite loop forever. not good. 
+--commenting out pred-prey code fixes this. 
+--wierd interaction between mutually recursive functions and ODEs
+--FIXME
+
+--myeven 0 = True
+--myeven n =  myodd (n-1)
+
+--myodd 0 = False
+--myodd n = myeven (n-1)
+
+
+
+--simple distributions
+
+fixdist = do
+  x ~ return (4:Int)
+  y ~ return 5
+  return (x + y)
+
+fixdist1 = do
+  x ~ return (4:Int)
+  y ~ return 5
+  w = x + y
+  return (w + y)
+
+nestedDo = do
+  x ~ do 
+    z ~ unit
+    return z
+  return $ x+1
+
+fixdistSam &lt;* sample $ fmap (\w-&gt;w&gt;6) fixdist
+fixdist1Sam &lt;* sample $ fmap (\w-&gt;w&gt;10) fixdist1
+nestedDoSam &lt;* sample $ fmap (\w-&gt;w&gt;1.0) nestedDo
+
+assert_fixdist = fixdistSam
+assert_fixdist1 = fixdist1Sam
+assert_nestedDo = nestedDoSam
+
+
+
+wdist = return ( xr =&gt; 2 )
+
+wdistSam &lt;* sample $ with wdist (between 1 3 xr) 
+assert_with = wdistSam
+
+
+-- records
+
+--ASSERT_TYPE rec1 {foo: Int; bar: String}
+
+rec1 = foo =&gt; (5:Int);bar=&gt;&quot;Hello!&quot;
+
+assert_rec_access1 = rec1#foo &gt; 4
+
+rec2 = baz=&gt;True
+--doesnt work for now: rec2 = rec1;baz=&gt;True or rec2 = baz=&gt;True;rec1
+
+assert_rec_access2= rec2#baz
+
+rec1foo = let {..} = rec1
+	  in foo
+
+assert_rec1_wild = between 4 6 rec1foo
+
+
+--implicit parameters
+
+
+fimpl foo? bar = foo+(bar:Int)
+
+impl_res = let foo = 2
+           in fimpl 5
+
+assert_implicit_params = impl_res == 7
+	 
+</pre></td></tr><tr><td>asserted_type_of_lst</td><td>pass</td><td>List Real</td></tr><tr><td>asserted_type_of_rec1</td><td>pass</td><td>{foo:Int, bar:String}</td></tr><tr><td>assert_fac3</td><td>pass</td><td>True</td></tr><tr><td>assert_pairs0</td><td>pass</td><td>True</td></tr><tr><td>assert_pairs1</td><td>pass</td><td>True</td></tr><tr><td>assert_case</td><td>pass</td><td>True</td></tr><tr><td>assert_case1</td><td>pass</td><td>True</td></tr><tr><td>assert_case2</td><td>pass</td><td>True</td></tr><tr><td>assert_case3</td><td>pass</td><td>True</td></tr><tr><td>assert_fhead</td><td>pass</td><td>True</td></tr><tr><td>assert_bool1</td><td>pass</td><td>True</td></tr><tr><td>assert_bool2</td><td>pass</td><td>True</td></tr><tr><td>assert_cmp</td><td>pass</td><td>True</td></tr><tr><td>assert_negative</td><td>pass</td><td>True</td></tr><tr><td>assert_length1</td><td>pass</td><td>True</td></tr><tr><td>assert_length2</td><td>pass</td><td>True</td></tr><tr><td>assert_list_lit_pattern</td><td>pass</td><td>True</td></tr><tr><td>assert_rec_access1</td><td>pass</td><td>True</td></tr><tr><td>assert_rec_access2</td><td>pass</td><td>True</td></tr><tr><td>assert_rec1_wild</td><td>pass</td><td>True</td></tr><tr><td>assert_implicit_params</td><td>pass</td><td>True</td></tr><tr><td>assert_fixdist</td><td>pass</td><td>True</td></tr><tr><td>assert_fixdist1</td><td>pass</td><td>True</td></tr><tr><td>assert_nestedDo</td><td>pass</td><td>True</td></tr><tr><td>assert_with</td><td>pass</td><td>True</td></tr><tr><td><h4>RecursiveTests</h4></td><td>77 ms</td><td><a onclick="$('#RecursiveTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RecursiveTests" style="display: none;"><td colspan="3"><pre>module RecursiveTests where
+
+import Prelude.bug
+
+
+myeven 0 = True
+myeven n =  myodd (n-1)
+
+myodd 0 = False
+myodd n = myeven (n-1)
+
+myeven1 0 = True
+myeven1 n =  myodd1 (n-1)
+
+myodd1 0 = False
+myodd1 n = myeven1 (n-1)
+
+
+assert_even_4 = myeven 4
+assert_even1_4 = myeven1 4
+assert_odd_5 = myodd 5
+assert_odd1_5 = myodd 5
+assert_noteven_5 = not $ myeven 5
+
+</pre></td></tr><tr><td>assert_even_4</td><td>pass</td><td>True</td></tr><tr><td>assert_even1_4</td><td>pass</td><td>True</td></tr><tr><td>assert_odd_5</td><td>pass</td><td>True</td></tr><tr><td>assert_odd1_5</td><td>pass</td><td>True</td></tr><tr><td>assert_noteven_5</td><td>pass</td><td>True</td></tr><tr><td><h4>ODETests</h4></td><td>137 ms</td><td><a onclick="$('#ODETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="ODETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+--ODEs
+
+dt = 0.005
+tmax = 1.1
+
+mysig_0 = 1.0
+
+D mysig t = sin (mysig t)
+
+assert_ode = between 1.9 2.0 $ mysig 1.0
+
+rvalpha   = 0.1
+rvbeta    = 0.01
+rvgamma   = 0.05
+rvdelta   = 0.001
+prey_0      = 50.0 
+pred_0      = 15
+D prey t    =     prey t    * (rvalpha  - rvbeta   * pred t) 
+D pred t    =  -  pred t    * (rvgamma  - rvdelta  * prey t)
+
+assert_prey = between 47 48 $ prey 1.0
+assert_pred = between 14.5 15.5 $ pred 1.0
+
+s3 = let zz_0 = 1.0
+         D zz = \t -&gt; sin t
+     in zz
+
+s4 = let v_0 = -0.07
+         w_0 = 0.0
+         D v = \t -&gt; 0.01 * v t -  w t
+         D w = \t -&gt; 0.3 *  w t - v t
+     in v 
+
+assert_let_odes = s4 1.0 &lt; 0 
+</pre></td></tr><tr><td>assert_ode</td><td>pass</td><td>True</td></tr><tr><td>assert_let_odes</td><td>pass</td><td>True</td></tr><tr><td>assert_prey</td><td>pass</td><td>True</td></tr><tr><td>assert_pred</td><td>pass</td><td>True</td></tr><tr><td><h4>DensityTests</h4></td><td>254 ms</td><td><a onclick="$('#DensityTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DensityTests" style="display: none;"><td colspan="3"><pre>{-
+TEST_COMPILER_ONLY
+-}
+
+module DensityTests where
+
+import Distributions.bug
+
+assert_normal_sampler_pdf1 = SamplerDensity (normal 0 1) (normalLogPdf 0 1)
+--assert_normal_sampler_pdf3 = SamplerDensity (normal 1 10) (normalLogPdf 1 10)
+--assert_normal_sampler_pdf5 = SamplerDensity (normal 10 1) (normalLogPdf 10 1)
+--assert_unormal_sampler_pdf = SamplerDensity (unormal) (normalLogPdf 0 1)
+
+
+assert_uniform_sampler_pdf1 = SamplerDensity (uniform 5 10) (uniformLogPdf 5 10)
+
+assert_lognormal_pdf = SamplerDensity (logNormal 1 1) (logNormalLogPdf 1 1)
+assert_gamma_pdf1 = SamplerDensity (gamma 1 2.0) (gammaLogPdf 1 2.0)
+assert_gamma_pdf2 = SamplerDensity (gamma 9 0.5) (gammaLogPdf 9 0.5)
+
+assert_invgamma_pdf1 = SamplerDensity (invGamma 1 1)   (invGammaLogPdf 1 1)
+assert_invgamma_pdf2 = SamplerDensity (invGamma 3 0.5) (invGammaLogPdf 3 0.5)
+
+</pre></td></tr><tr><td>assert_normal_sampler_pdf1</td><td>pass</td><td>-2.962321757975299,-2.7334256221768056,-2.708507508028455,-2.685714600661361,-2.665611627638</td></tr><tr><td>assert_uniform_sampler_pdf1</td><td>pass</td><td>5.002272197743878,5.026009957073256,5.026589168701321,5.028304518200457,5.030277899932116</td></tr><tr><td>assert_lognormal_pdf</td><td>pass</td><td>0.12617173381058655,0.16722288099020785,0.19172012837639202,0.207225125596122,0.24503340468300275</td></tr><tr><td>assert_gamma_pdf1</td><td>pass</td><td>0.0074350288924385655,0.00761731223625439,0.008562910544327585,0.010459249761098766,0.014064898490097963</td></tr><tr><td>assert_gamma_pdf2</td><td>pass</td><td>1.3293158393423627,1.5226234919851072,1.5881741584277986,1.7252774710180283,1.73447229291713</td></tr><tr><td>assert_invgamma_pdf1</td><td>fail</td><td>p=0; 0.1148908865145645,0.14173286050913772,0.14397699336372957,0.16093778654186522,0.16265346808631678</td></tr><tr><td>assert_invgamma_pdf2</td><td>fail</td><td>p=0; 0.044310982424642334,0.046732843894291436,0.048277582545301546,0.0491268188047283,0.05320182267674022</td></tr><tr><td><h4>RegressEstim</h4></td><td>492 ms</td><td><a onclick="$('#RegressEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressEstim" style="display: none;"><td colspan="3"><pre>module RegressEstim where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = do
+   offset  ~  normal 0 1.0
+   sigma   ~  gamma 1 1
+   slope   ~  normal 0.0 1.0
+   repeat 50  $ do   w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return $ foo=&gt;w;bar=&gt;y
+
+regress1 &lt;* updateS regress $ return $ offset=&gt; (-0.5);slope=&gt;1;sigma=&gt;0.1
+
+fakedata &lt;* sample regress1
+
+pars &lt;* estimateStan regress fakedata
+
+assert_mean_pos = Mostly (with pars $ slope &gt; 0.5)
+
+</pre></td></tr><tr><td>assert_mean_pos</td><td>pass</td><td>99.6%</td></tr><tr><td><h4>NotDefined</h4></td><td>0 ms</td><td><a onclick="$('#NotDefined').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="NotDefined" style="display: none;"><td colspan="3"><pre>module NotFound where
+
+import Prelude.bug
+
+x = notDefinedAnyWhere + 1
+</pre></td></tr><tr><td>NotDefined_must_fail</td><td>pass</td><td>Undefined variable: notDefinedAnyWhere</td></tr><tr><td><h4>DiffMeansCook</h4></td><td>13875 ms</td><td><a onclick="$('#DiffMeansCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DiffMeansCook" style="display: none;"><td colspan="3"><pre>module DiffMeansCook where
+
+import Distributions.bug
+
+samples = 5000
+
+diffmeans = do
+    mean ~ uniform 0.0 1.0
+    diff ~ uniform (-0.5) 0.5
+    rvar ~ gamma 1 1
+    xs ~ repeat 50 $ normal mean rvar
+    ys ~ repeat 50 $ normal (mean+diff) rvar
+    return (xs, ys)
+
+              
+diffmeansQuantiles &lt;* cookEstimateTestStan diffmeans 25
+
+assert_diffmeans_mean = cookAssert $ diffmeansQuantiles#mean
+assert_diffmeans_diff = cookAssert $ diffmeansQuantiles#diff
+assert_diffmeans_var = cookAssert $ diffmeansQuantiles#rvar
+
+</pre></td></tr><tr><td>assert_diffmeans_mean</td><td>pass</td><td>0.01200960768614892,0.07285828662930344,0.08726981585268215,0.14171337069655723,0.14411529223378702</td></tr><tr><td>assert_diffmeans_diff</td><td>pass</td><td>0.020016012810248198,0.09047237790232186,0.09527622097678143,0.16172938350680544,0.2321857485988791</td></tr><tr><td>assert_diffmeans_var</td><td>pass</td><td>0.004803843074459567,0.03362690152121697,0.0488390712570056,0.06485188150520416,0.07365892714171338</td></tr><tr><td><h4>RegressCook</h4></td><td>4904 ms</td><td><a onclick="$('#RegressCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressCook" style="display: none;"><td colspan="3"><pre>module RegressCook where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = do
+   offset  ~  normal 0 1.0
+   sigma   ~  gamma 1 1
+   slope   ~  normal 0.5 1.0
+   repeat 20  $ do   w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return (w,y) 
+              
+regressQuantiles &lt;* cookEstimateTestStan regress 25
+
+assert_regress_offset = cookAssert $ regressQuantiles#offset
+assert_regress_sigma = cookAssert $ regressQuantiles#sigma
+assert_regress_slope = cookAssert $ regressQuantiles#slope
+
+</pre></td></tr><tr><td>assert_regress_offset</td><td>pass</td><td>0.05105105105105105,0.06006006006006006,0.0890890890890891,0.1021021021021021,0.11211211211211211</td></tr><tr><td>assert_regress_sigma</td><td>pass</td><td>0.1061061061061061,0.12012012012012012,0.2022022022022022,0.21921921921921922,0.2802802802802803</td></tr><tr><td>assert_regress_slope</td><td>pass</td><td>0.08608608608608609,0.12312312312312312,0.26126126126126126,0.3153153153153153,0.34134134134134136</td></tr><tr><td><h4>Update</h4></td><td>86 ms</td><td><a onclick="$('#Update').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Update" style="display: none;"><td colspan="3"><pre>module Update where
+
+import Distributions.bug
+
+upsampler = do
+   mean ~ uniform 3 4
+   return mean
+
+upsampler1 &lt;* updateS upsampler $ return $ mean=&gt; 1
+
+upsample &lt;* sample upsampler1
+
+assert_update = between 0.5 1.5 upsample
+</pre></td></tr><tr><td>assert_update</td><td>pass</td><td>True</td></tr><tr><td><h4>Constructor</h4></td><td>0 ms</td><td><a onclick="$('#Constructor').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Constructor" style="display: none;"><td colspan="3"><pre>module Constructor where
+
+import Prelude.bug
+
+x = Cons 5 $ Cons &quot;foo&quot; Nil</pre></td></tr><tr><td>Constructor_must_fail</td><td>pass</td><td>cannot unify: String and Num ?vint_2021 in x</td></tr><tr><td><h4>RegressDVarCook</h4></td><td>5632 ms</td><td><a onclick="$('#RegressDVarCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressDVarCook" style="display: none;"><td colspan="3"><pre>module RegressDVarCook where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = do
+   offset  ~  uniform 1.0 5.0
+   sigma   ~  gamma 1 1
+   slope1  ~  uniform (-0.5) 1.0
+   slope   =  exp slope1
+   repeat 20  $ do   w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return (w,y) 
+              
+regressQuantiles &lt;* cookEstimateTestStan regress 25
+
+assert_regressD_offset = cookAssert $ regressQuantiles#offset
+assert_regressD_sigma  = cookAssert $ regressQuantiles#sigma
+assert_regressD_slope1 = cookAssert $ regressQuantiles#slope1
+
+</pre></td></tr><tr><td>assert_regressD_offset</td><td>pass</td><td>0.057057057057057055,0.24124124124124124,0.2682682682682683,0.3333333333333333,0.3633633633633634</td></tr><tr><td>assert_regressD_sigma</td><td>pass</td><td>0.009009009009009009,0.021021021021021023,0.09509509509509509,0.11611611611611612,0.1961961961961962</td></tr><tr><td>assert_regressD_slope1</td><td>pass</td><td>0.04904904904904905,0.09009009009009009,0.0960960960960961,0.1111111111111111,0.11711711711711711</td></tr><tr><td><h4>BugsessTest</h4></td><td>88 ms</td><td><a onclick="$('#BugsessTest').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="BugsessTest" style="display: none;"><td colspan="3"><pre>module BugsessTest where
+
+import Prelude.bug
+
+--ASSERT_TYPE five Int
+
+five &lt;* fetch &quot;testdb/five&quot;
+
+rec &lt;* fetch &quot;testdb/testrec&quot;
+
+rec1 &lt;* fetch &quot;testdb/morerec&quot;
+
+assert_fetch1 = five == 5
+
+--ASSERT_TYPE rec {age: Int; name: String}
+--assert_name = rec#name == &quot;Tom&quot;
+assert_age = rec#age == 35
+assert_deep_age = rec1#sub2#zoo#age == 35
+assert_stored_signal = between 0 2 $ (rec1#sub2#baz) 0.2</pre></td></tr><tr><td>asserted_type_of_five</td><td>pass</td><td>Int</td></tr><tr><td>asserted_type_of_rec</td><td>pass</td><td>{age:Int, name:String}</td></tr><tr><td>assert_fetch1</td><td>pass</td><td>True</td></tr><tr><td>assert_age</td><td>pass</td><td>True</td></tr><tr><td>assert_deep_age</td><td>pass</td><td>True</td></tr><tr><td>assert_stored_signal</td><td>pass</td><td>True</td></tr><tr><td><h4>Add</h4></td><td>0 ms</td><td><a onclick="$('#Add').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Add" style="display: none;"><td colspan="3"><pre>module Add where
+
+import Prelude.bug
+
+{-
+    correct method for typechecking this definition:
+    1. we assume that `+&#39; is of type Int -&gt; Int -&gt; Int or equivalent
+    2. we can think of the expression as ((+ 5) &quot;foo&quot;)
+    3. we begin with the whole expression, detect that it&#39;s an application
+       and continue with the left sub-expression
+    4. we now need to infer the type of (+ 5) which is another application,
+       so we continue with the left sub-expression
+    5. `+&#39; is a variable which has type Int -&gt; (Int -&gt; Int) in the context
+    6. 5 is a literal of type Int which matches the parameter of `+&#39;
+    7. (+ 5) is of type Int -&gt; Int
+    8. &quot;foo&quot; is a literal of type String which doesn&#39;t match the expected type Int
+       and there exists no way of unifying these two types
+    9. the expression is therefore incorrectly typed
+-}
+
+x = 5 + &quot;foo&quot;</pre></td></tr><tr><td>Add_must_fail</td><td>pass</td><td>cannot unify: Num ?refresha_2018 and String in x</td></tr><tr><td colspan="3"><h4>RegressEstim1</h4></td></tr><tr><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_w; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_w; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-core/Baysig/JsBackend/prebaysig.js:307:5
+    at /home/tomn/baysig-core/Baysig/JsBackend/prebaysig.js:281:16
+    at w (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:169:258)
+    at w (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:169:271)
+    at w (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:169:277)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:169:287
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:169:905)
+    at Module._compile (module.js:449:26)
+    at Object.Module._extensions..js (module.js:467:10)
+</pre></td></tr><tr><td><h4>DiffMeansEstim</h4></td><td>658 ms</td><td><a onclick="$('#DiffMeansEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DiffMeansEstim" style="display: none;"><td colspan="3"><pre>module DiffMeansEstim where
+
+import Distributions.bug
+
+samples = 5000
+
+diffmeans = do
+    mean ~ uniform 0.0 1.0
+    diff ~ uniform (-0.5) 0.5
+    rvar ~ gamma 1 1
+    xs ~ repeat 50 $ normal mean rvar
+    ys ~ repeat 50 $ normal (mean+diff) rvar
+    return (xs, ys)
+
+diffmeans1 &lt;* updateS diffmeans $ return $ mean=&gt; 0.5;diff=&gt;0.2;rvar=&gt;0.1
+
+fakedata &lt;* sample diffmeans1
+
+pars &lt;* estimateStan diffmeans fakedata
+
+assert_mean_pos = Always (with pars $ mean &gt; 0.0)</pre></td></tr><tr><td>assert_mean_pos</td><td>pass</td><td>True,True,True,True,True</td></tr></table></body></html>
