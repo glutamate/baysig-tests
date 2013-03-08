@@ -1,0 +1,745 @@
+<!DOCTYPE HTML>
+<html><head><title>08March2013_222137</title><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script></head><body><h2>08March2013_222137</h2><table><tr><th>package</th><th>git commit hash</th><th>modified</th></tr><tr><td>baysig-core</td><td>ac61b64f7901f78445d3be560041e97c2242b5d3
+</td><td></td></tr><tr><td>bugsess</td><td>acf9889e71f05f999f5ad429a76dc9722e3fefd9
+</td><td></td></tr><tr><td>baysig-exec</td><td>a53b8768b80232deeb595916bff09c35d349f20e
+</td><td></td></tr></table><table><tr><td colspan="3"><h4>DistributionTest</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>type error: Undefined variable: decide</pre></td></tr><tr><td><h4>LogisticEstim1</h4></td><td>387 ms</td><td><a onclick="$('#LogisticEstim1').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="LogisticEstim1" style="display: none;"><td colspan="3"><pre>module RegressCook where
+
+import Distributions.bug
+
+logistic = prob
+   offset  ~  normal 0 2
+   slope   ~  uniform (-10) 10.0
+   repeat 20  $ prob   w ~ uniform 0.0 1.0
+                       y ~ bernoulli01(invlogit(offset+slope*w))
+                       return (w,y) 
+  
+logistic1 &lt;* updateN logistic $ return ( offset =&gt; (-2.0);
+					 slope =&gt; 4.0)
+
+fakeData &lt;* sample logistic1
+
+logitPars &lt;* estimateStan logistic fakeData
+
+assert_mean_pos = Mostly (with logitPars $ slope &gt; 0.5)
+            
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>89.4%</td></tr><tr><td><h4>PreludeTests</h4></td><td>88 ms</td><td><a onclick="$('#PreludeTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="PreludeTests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+assert_fac3 = fac 3 == 6
+
+assert_pairs0 = 2 == fst (2,3)
+assert_pairs1 = 3 == snd (2,3)
+
+assert_case = case 1 of
+        0 -&gt; False
+        1 -&gt; True
+
+assert_case1 = case 1 of
+        0 -&gt; False
+        _ -&gt; True
+
+assert_case2 = case 1 of
+        0 -&gt; False
+        x -&gt; True
+
+assert_case3 = not $ case 0 of
+        0 -&gt; False
+        x -&gt; True
+
+f x = 2 * x + 1
+
+lst = Cons 5.3 $ Cons 2.1 Nil
+
+nothing_to_see = let &lt;x,y,z&gt; = fillV 3 (\i-&gt; unround i)
+	       	 in ()
+
+--ASSERT_TYPE lst (List Real)
+
+assert_fhead = between 10 12 $ f $ head lst
+
+assert_bool1 = (True &amp;&amp; False) || (True || False)
+
+assert_bool2 = not $ (True &amp;&amp; False) || (True &amp;&amp; False)
+
+assert_cmp = if ((f $ head lst) &gt; 10) then True else False
+
+assert_negative = -5 &lt; 0
+
+assert_length1 = length lst == 2
+
+lst_lit = [6.2, 4.5, 8.9]
+
+assert_length2 = length lst_lit == 3
+
+asset_litlist1 = between 6 7 $ ix 0 lst_lit
+asset_litlist2 = between 8 9 $ ix 2 lst_lit
+
+llpat = let [x,y] = lst
+        in x
+
+assert_list_lit_pattern = between 5 6 llpat
+
+
+
+
+--the mere definition of these makes the test suite loop forever. not good. 
+--commenting out pred-prey code fixes this. 
+--wierd interaction between mutually recursive functions and ODEs
+--FIXME
+
+--myeven 0 = True
+--myeven n =  myodd (n-1)
+
+--myodd 0 = False
+--myodd n = myeven (n-1)
+
+
+
+--simple distributions
+
+fixdist = prob
+  x ~ return (4:Int)
+  y ~ return 5
+  return (x + y)
+
+fixdist1 = prob
+  x ~ return (4:Int)
+  y ~ return 5
+  w = x + y
+  return (w + y)
+
+nestedDo = prob
+  x ~ prob 
+    z ~ unit
+    return z
+  return $ x+1
+
+fixdistSam &lt;* sample $ fmap (\w-&gt;w&gt;6) fixdist
+fixdist1Sam &lt;* sample $ fmap (\w-&gt;w&gt;10) fixdist1
+nestedDoSam &lt;* sample $ fmap (\w-&gt;w&gt;1.0) nestedDo
+
+assert_fixdist = fixdistSam
+assert_fixdist1 = fixdist1Sam
+assert_nestedDo = nestedDoSam
+
+
+
+wdist = return ( xr =&gt; 2 )
+
+wdistSam &lt;* sample $ with wdist (between 1 3 xr) 
+assert_with = wdistSam
+
+
+-- records
+
+--ASSERT_TYPE rec1 {foo: Int; bar: String}
+
+rec1 = foo =&gt; (5:Int);bar=&gt;&quot;Hello!&quot;
+
+assert_rec_access1 = rec1#foo &gt; 4
+
+rec2 = baz=&gt;True
+--doesnt work for now: rec2 = rec1;baz=&gt;True or rec2 = baz=&gt;True;rec1
+
+assert_rec_access2= rec2#baz
+
+rec1foo = let {..} = rec1
+	  in foo
+
+assert_rec1_wild = between 4 6 rec1foo
+
+
+--implicit parameters
+
+
+fimpl foo? bar = foo+(bar:Int)
+
+impl_res = let foo = 2
+           in fimpl 5
+
+assert_implicit_params = impl_res == 7
+	 
+
+pair_num_list = (3, [5])
+
+assert_pair_num_list = fst pair_num_list == 3
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_lst</td><td>pass</td><td>List Real</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_rec1</td><td>pass</td><td>{foo:Int, bar:String}</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fac3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pairs0</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pairs1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fhead</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_bool1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_bool2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_cmp</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_negative</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_list_lit_pattern</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pair_num_list</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec_access1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec_access2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec1_wild</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_implicit_params</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fixdist</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fixdist1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_nestedDo</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_with</td><td>pass</td><td>True</td></tr><tr><td><h4>RecursiveTests</h4></td><td>89 ms</td><td><a onclick="$('#RecursiveTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RecursiveTests" style="display: none;"><td colspan="3"><pre>module RecursiveTests where
+
+import Prelude.bug
+
+
+myeven 0 = True
+myeven n =  myodd (n-1)
+
+myodd 0 = False
+myodd n = myeven (n-1)
+
+myeven1 0 = True
+myeven1 n =  myodd1 (n-1)
+
+myodd1 0 = False
+myodd1 n = myeven1 (n-1)
+
+
+assert_even_4 = myeven 4
+assert_even1_4 = myeven1 4
+assert_odd_5 = myodd 5
+assert_odd1_5 = myodd 5
+assert_noteven_5 = not $ myeven 5
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_even_4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_even1_4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_odd_5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_odd1_5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_noteven_5</td><td>pass</td><td>True</td></tr><tr><td><h4>HestonEstim</h4></td><td>111374 ms</td><td><a onclick="$('#HestonEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="HestonEstim" style="display: none;"><td colspan="3"><pre>module HestonCook where
+
+import Distributions.bug
+tmax = 10.0
+dt = 0.01
+
+samples= 2000
+
+heston = prob
+   k        ~ gamma 1 1
+   th       ~ gamma 1 0.1
+   eta      ~ gamma 1 0.1
+   mu       ~ normal 0 0.1
+   w1       ~  wiener
+   w2       ~  wiener
+   v_0      ~  gamma 1 0.1
+   s_0      ~  uniform 0.0 2.0
+   d v t = k * (th - v t) + eta * sqrt (v t) * d w1 t
+   d s t = mu * s t + sqrt (v t) * s t * d w2 t
+   return s
+
+heston1  &lt;* updateN heston (return (  k=&gt;1.0;
+                                      th=&gt;0.02;
+                                      eta=&gt;0.1;
+                                      mu=&gt;0.05;
+                                      v_0=&gt;0.02;
+                                      s_0=&gt;1.0))
+
+
+
+fakedata &lt;* sample heston1
+
+pars &lt;* estimateStan heston fakedata
+
+assert_k_pos = Mostly (with pars $ k &gt; 0.0)
+
+assert_v_pos = Mostly (with pars $ v 5.0 &gt; 0.0)
+
+hestonForward &lt;* fastForward heston pars fakedata
+
+future &lt;* sample hestonForward
+
+--future 5.0 *&gt; console
+
+assert_fast_forward = future 0.1 &gt; 0
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_k_pos</td><td>pass</td><td>100%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_v_pos</td><td>pass</td><td>100%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fast_forward</td><td>pass</td><td>True</td></tr><tr><td><h4>ODETests</h4></td><td>84 ms</td><td><a onclick="$('#ODETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="ODETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+--ODEs
+
+dt = 0.005
+tmax = 1.1
+
+mysig_0 = 1.0
+
+D mysig t = sin (mysig t)
+
+assert_ode = between 1.9 2.0 $ mysig 1.0
+
+rvalpha   = 0.1
+rvbeta    = 0.01
+rvgamma   = 0.05
+rvdelta   = 0.001
+prey_0      = 50.0 
+pred_0      = 15
+D prey t    =     prey t    * (rvalpha  - rvbeta   * pred t) 
+D pred t    =  -  pred t    * (rvgamma  - rvdelta  * prey t)
+
+assert_prey = between 47 48 $ prey 1.0
+assert_pred = between 14.5 15.5 $ pred 1.0
+
+s3 = let zz_0 = 1.0
+         D zz = \t -&gt; sin t
+     in zz
+
+s4 = let v_0 = -0.07
+         w_0 = 0.0
+         D v = \t -&gt; 0.01 * v t -  w t
+         D w = \t -&gt; 0.3 *  w t - v t
+     in v 
+
+assert_let_odes = s4 1.0 &lt; 0 
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_ode</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_let_odes</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_prey</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pred</td><td>pass</td><td>True</td></tr><tr><td><h4>SDETests</h4></td><td>11145 ms</td><td><a onclick="$('#SDETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="SDETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Distributions.bug
+
+dt = 0.005
+tmax = 2.1
+
+
+w2 = prob
+       w ~ wiener
+       return (w 2.0)
+
+assert_wiener_var2 = SamplerDensity (w2) (normalLogPdf 0 2)
+
+w3 = prob
+       w ~ wiener
+       s_0 = 1
+       d s t = 0 + d w t
+       return (s 2.0)
+
+assert_sde_dist = SamplerDensity (w3) (normalLogPdf 1 2)
+
+w4 = prob
+       w ~ wiener
+       s_0 = 0
+       d s t = - s t + d w t
+       return (s 2.0)
+
+
+assert_ou_dist = SamplerDensity (w4) (normalLogPdf 0 0.5) -- ?
+
+</pre></td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_wiener_var2</td><td>fail</td><td>p=0.042755789897103304; -4.161891403285611,-3.2238219023457546,-3.1896350760095746,-3.1601196306757138,-2.885795894071375</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_sde_dist</td><td>pass</td><td>-3.2262801344218435,-2.5852635083869395,-2.56466794289814,-2.549836407945597,-2.4717755709501796</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_ou_dist</td><td>pass</td><td>-2.01440038227342,-1.8903328387850988,-1.753763486056162,-1.75055761189619,-1.7014704675687036</td></tr><tr><td><h4>LogisticEstim</h4></td><td>387 ms</td><td><a onclick="$('#LogisticEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="LogisticEstim" style="display: none;"><td colspan="3"><pre>module RegressCook where
+
+import Distributions.bug
+
+logistic = prob
+   offset  ~  normal 0 2
+   slope   ~  uniform (-10) 10.0
+   repeat 20  $ prob   w ~ uniform 0.0 1.0
+                       y ~ bernoulli(invlogit(offset+slope*w))
+                       return (w,y) 
+  
+logistic1 &lt;* updateN logistic $ return ( offset =&gt; (-2.0);
+					 slope =&gt; 4.0)
+
+fakeData &lt;* sample logistic1
+
+logitPars &lt;* estimateStan logistic fakeData
+
+assert_mean_pos = Mostly (with logitPars $ slope &gt; 0.5)
+            
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>98%</td></tr><tr><td colspan="3"><h4>WishList</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>parse error: parse error in WishList.bug: (line 5, column 0):
+unexpected Op &quot;=&quot; at (14,5)
+expecting operator</pre></td></tr><tr><td><h4>DensityTests</h4></td><td>260 ms</td><td><a onclick="$('#DensityTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DensityTests" style="display: none;"><td colspan="3"><pre>{-
+TEST_COMPILER_ONLY
+-}
+
+module DensityTests where
+
+import Distributions.bug
+
+assert_normal_sampler_pdf1 = SamplerDensity (normal 0 1) (normalLogPdf 0 1)
+--assert_normal_sampler_pdf3 = SamplerDensity (normal 1 10) (normalLogPdf 1 10)
+--assert_normal_sampler_pdf5 = SamplerDensity (normal 10 1) (normalLogPdf 10 1)
+--assert_unormal_sampler_pdf = SamplerDensity (unormal) (normalLogPdf 0 1)
+
+
+assert_uniform_sampler_pdf1 = SamplerDensity (uniform 5 10) (uniformLogPdf 5 10)
+
+assert_lognormal_pdf = SamplerDensity (logNormal 1 1) (logNormalLogPdf 1 1)
+assert_gamma_pdf1 = SamplerDensity (gamma 1 2.0) (gammaLogPdf 1 2.0)
+assert_gamma_pdf2 = SamplerDensity (gamma 9 0.5) (gammaLogPdf 9 0.5)
+
+assert_invgamma_pdf1 = SamplerDensity (invGamma 1 1)   (invGammaLogPdf 1 1)
+assert_invgamma_pdf2 = SamplerDensity (invGamma 3 0.5) (invGammaLogPdf 3 0.5)
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_normal_sampler_pdf1</td><td>pass</td><td>-2.9279980277060043,-2.6381092718716626,-2.50246499235982,-2.4820241459545573,-2.4091125393142474</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_uniform_sampler_pdf1</td><td>pass</td><td>5.0298784440383315,5.041451526340097,5.04203004646115,5.048630869714543,5.05580410012044</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_lognormal_pdf</td><td>pass</td><td>0.14879805580620653,0.1982334029526694,0.28372676919948103,0.2880797211587944,0.2957494529966065</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_gamma_pdf1</td><td>pass</td><td>0.007532369705457815,0.008853363441912886,0.009586839553311332,0.010586536178509427,0.01365434272370989</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_gamma_pdf2</td><td>pass</td><td>1.333885457597802,1.3541145002044264,1.5189704254597636,1.5419505852939563,1.566703822657788</td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_invgamma_pdf1</td><td>fail</td><td>p=0; 0.1781080521302323,0.18707562483432097,0.188211377295575,0.2112237135202063,0.2222877792278321</td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_invgamma_pdf2</td><td>fail</td><td>p=0; 0.04270358577668598,0.04332448611311214,0.05132670429291185,0.05402020827692161,0.05847162078009051</td></tr><tr><td><h4>RegressEstim</h4></td><td>499 ms</td><td><a onclick="$('#RegressEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressEstim" style="display: none;"><td colspan="3"><pre>module RegressEstim where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = prob
+   offset  ~  normal 0 1.0
+   sigma   ~  gamma 1 1
+   slope   ~  normal 0.0 1.0
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return $ foo=&gt;w;bar=&gt;y
+
+regress1 &lt;* updateS regress $ return $ offset=&gt; (-0.5);slope=&gt;1;sigma=&gt;0.1
+
+fakedata &lt;* sample regress1
+
+pars &lt;* estimateStan regress fakedata
+
+assert_mean_pos = Mostly (with pars $ slope &gt; 0.5)
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>98.8%</td></tr><tr><td colspan="3"><h4>NestedRegression</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:175
+))))( (appendStrings((((showBugsNm(dt)( tmax))(&quot;N_final0&quot;))((length(final0))))
+                                                                    ^
+ReferenceError: final0 is not defined
+    at w (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:175:292)
+    at w (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:175:482)
+    at w (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:175:488)
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression.js:175:498
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:175:1442)
+    at Module._compile (module.js:449:26)
+    at Object.Module._extensions..js (module.js:467:10)
+    at Module.load (module.js:356:32)
+    at Function.Module._load (module.js:312:12)
+    at Module.runMain (module.js:492:10)
+</pre></td></tr><tr><td><h4>RegressEstimImproper</h4></td><td>477 ms</td><td><a onclick="$('#RegressEstimImproper').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressEstimImproper" style="display: none;"><td colspan="3"><pre>module RegressEstim where
+
+import Distributions.bug
+
+samples = 10000
+
+regress0 = prob
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (1*w-0.5) 0.1
+                     return $ foo=&gt;w;bar=&gt;y
+
+regress = prob
+   beta_0  ~  improper_uniform
+   sigma   ~  gamma 1 1 
+   beta_y  ~  improper_uniform
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (beta_0+beta_y*w) sigma
+                     return $ foo=&gt;w;bar=&gt;y
+
+fakedata &lt;* sample regress0
+
+pars &lt;* estimateStan regress fakedata
+
+assert_mean_pos = Mostly (with pars $ beta_y &gt; 0.5)
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>100%</td></tr><tr><td><h4>NotDefined</h4></td><td>0 ms</td><td><a onclick="$('#NotDefined').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="NotDefined" style="display: none;"><td colspan="3"><pre>module NotFound where
+
+import Prelude.bug
+
+x = notDefinedAnyWhere + 1
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>NotDefined_must_fail</td><td>pass</td><td>Undefined variable: notDefinedAnyWhere</td></tr><tr><td><h4>HestonEstim1</h4></td><td>6314 ms</td><td><a onclick="$('#HestonEstim1').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="HestonEstim1" style="display: none;"><td colspan="3"><pre>module HestonCook where
+
+import Distributions.bug
+tmax = 10.0
+dt = 0.01
+
+samples= 2000
+
+heston = prob
+   k        ~ gamma 1 1
+   th       ~ gamma 1 0.1
+   eta      ~ gamma 1 0.1
+   mu       ~ normal 0 0.1
+   w1       ~  wiener
+   w2       ~  wiener
+   v_0      ~  gamma 1 0.1
+   s_0      ~  uniform 0.0 2.0
+   d v t = k * (th - v t) + eta * sqrt (v t) * d w1 t
+   d s t = mu * s t + sqrt (v t) * s t * d w2 t
+   return (v,s)
+
+heston1  &lt;* updateN heston (return (  k=&gt;1.0;
+                                      th=&gt;0.02;
+                                      eta=&gt;0.1;
+                                      mu=&gt;0.05;
+                                      v_0=&gt;0.02;
+                                      s_0=&gt;1.0))
+
+
+
+fakedata &lt;* sample heston1
+
+pars &lt;* estimateStan heston fakedata
+
+--pars *&gt; console
+
+assert_k_pos = Mostly (with pars $ k &gt; 0.0)
+
+
+
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_k_pos</td><td>pass</td><td>100%</td></tr><tr><td><h4>LogisticCook</h4></td><td>7644 ms</td><td><a onclick="$('#LogisticCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="LogisticCook" style="display: none;"><td colspan="3"><pre>module RegressCook where
+
+import Distributions.bug
+
+logistic = prob
+   offset  ~  normal 0 2
+   slope   ~  uniform (-10) 10.0
+   repeat 20  $ prob   w ~ uniform 0.0 1.0
+                       y ~ bernoulli(invlogit(offset+slope*w))
+                       return (w,y) 
+  
+logisticQuantiles &lt;* cookEstimateTestStan logistic 25
+
+assert_logistic_offset = cookAssert $ logisticQuantiles#offset
+assert_logistic_slope = cookAssert $ logisticQuantiles#slope
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_logistic_offset</td><td>pass</td><td>0.0980980980980981,0.0980980980980981,0.16416416416416416,0.17017017017017017,0.18218218218218218</td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_logistic_slope</td><td>fail</td><td>p=0.04034732996298282; 0.03903903903903904,0.07807807807807808,0.11311311311311312,0.12712712712712712,0.23623623623623624</td></tr><tr><td><h4>DiffMeansCook</h4></td><td>14498 ms</td><td><a onclick="$('#DiffMeansCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DiffMeansCook" style="display: none;"><td colspan="3"><pre>module DiffMeansCook where
+
+import Distributions.bug
+
+samples = 5000
+
+diffmeans = prob
+    mean ~ uniform 0.0 1.0
+    diff ~ uniform (-0.5) 0.5
+    rvar ~ gamma 1 1
+    xs ~ repeat 50 $ normal mean rvar
+    ys ~ repeat 50 $ normal (mean+diff) rvar
+    return (xs, ys)
+
+              
+diffmeansQuantiles &lt;* cookEstimateTestStan diffmeans 25
+
+assert_diffmeans_mean = cookAssert $ diffmeansQuantiles#mean
+assert_diffmeans_diff = cookAssert $ diffmeansQuantiles#diff
+assert_diffmeans_var = cookAssert $ diffmeansQuantiles#rvar
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_diffmeans_mean</td><td>pass</td><td>0.01200960768614892,0.04323458767013611,0.07526020816653323,0.10168134507606084,0.11609287429943956</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_diffmeans_diff</td><td>pass</td><td>0.02321857485988791,0.0488390712570056,0.14971977582065651,0.23138510808646917,0.24739791833466773</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_diffmeans_var</td><td>pass</td><td>0.0600480384307446,0.09367493995196156,0.10168134507606084,0.11048839071257005,0.1289031224979984</td></tr><tr><td><h4>RegressCook</h4></td><td>5225 ms</td><td><a onclick="$('#RegressCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressCook" style="display: none;"><td colspan="3"><pre>module RegressCook where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = prob
+   offset  ~  normal 0 1.0
+   sigma   ~  gamma 1 1
+   slope   ~  normal 0.5 1.0
+   repeat 20  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return (w,y) 
+              
+regressQuantiles &lt;* cookEstimateTestStan regress 25
+
+assert_regress_offset = cookAssert $ regressQuantiles#offset
+assert_regress_sigma = cookAssert $ regressQuantiles#sigma
+assert_regress_slope = cookAssert $ regressQuantiles#slope
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_regress_offset</td><td>pass</td><td>0.14014014014014015,0.16416416416416416,0.16916916916916916,0.22522522522522523,0.32732732732732733</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_regress_sigma</td><td>pass</td><td>0.012012012012012012,0.03203203203203203,0.04804804804804805,0.06006006006006006,0.06506506506506507</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_regress_slope</td><td>pass</td><td>0.006006006006006006,0.02702702702702703,0.07207207207207207,0.1011011011011011,0.21621621621621623</td></tr><tr><td><h4>Update</h4></td><td>90 ms</td><td><a onclick="$('#Update').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Update" style="display: none;"><td colspan="3"><pre>module Update where
+
+import Distributions.bug
+
+upsampler = prob
+   mean ~ uniform 3 4
+   return mean
+
+upsampler1 &lt;* updateS upsampler $ return $ mean=&gt; 1
+
+upsample &lt;* sample upsampler1
+
+assert_update = between 0.5 1.5 upsample
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_update</td><td>pass</td><td>True</td></tr><tr><td><h4>Constructor</h4></td><td>0 ms</td><td><a onclick="$('#Constructor').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Constructor" style="display: none;"><td colspan="3"><pre>module Constructor where
+
+import Prelude.bug
+
+x = Cons 5 $ Cons &quot;foo&quot; Nil</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Constructor_must_fail</td><td>pass</td><td>cannot unify: String and Num ?vint_2013 in x</td></tr><tr><td><h4>RegressDVarCook</h4></td><td>5665 ms</td><td><a onclick="$('#RegressDVarCook').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressDVarCook" style="display: none;"><td colspan="3"><pre>module RegressDVarCook where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = prob
+   offset  ~  uniform 1.0 5.0
+   sigma   ~  gamma 1 1
+   slope1  ~  uniform (-0.5) 1.0
+   slope   =  exp slope1
+   repeat 20  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return (w,y) 
+              
+regressQuantiles &lt;* cookEstimateTestStan regress 25
+
+assert_regressD_offset = cookAssert $ regressQuantiles#offset
+assert_regressD_sigma  = cookAssert $ regressQuantiles#sigma
+assert_regressD_slope1 = cookAssert $ regressQuantiles#slope1
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_regressD_offset</td><td>pass</td><td>0.028028028028028028,0.05005005005005005,0.0960960960960961,0.11711711711711711,0.2062062062062062</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_regressD_sigma</td><td>pass</td><td>0.006006006006006006,0.006006006006006006,0.14614614614614616,0.16916916916916916,0.17417417417417416</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_regressD_slope1</td><td>pass</td><td>0.05905905905905906,0.07007007007007007,0.12412412412412413,0.23723723723723725,0.25425425425425424</td></tr><tr><td><h4>BugsessTest</h4></td><td>95 ms</td><td><a onclick="$('#BugsessTest').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="BugsessTest" style="display: none;"><td colspan="3"><pre>module BugsessTest where
+
+import Prelude.bug
+
+--ASSERT_TYPE five Int
+
+five &lt;* fetch &quot;testdb/five&quot;
+
+rec &lt;* fetch &quot;testdb/testrec&quot;
+
+rec1 &lt;* fetch &quot;testdb/morerec&quot;
+
+assert_fetch1 = five == 5
+
+--ASSERT_TYPE rec {age: Int; name: String}
+--assert_name = rec#name == &quot;Tom&quot;
+assert_age = rec#age == 35
+assert_deep_age = rec1#sub2#zoo#age == 35
+assert_stored_signal = between 0 2 $ (rec1#sub2#baz) 0.2</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_five</td><td>pass</td><td>Int</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_rec</td><td>pass</td><td>{age:Int, name:String}</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fetch1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_age</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_deep_age</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_stored_signal</td><td>pass</td><td>True</td></tr><tr><td><h4>Add</h4></td><td>0 ms</td><td><a onclick="$('#Add').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Add" style="display: none;"><td colspan="3"><pre>module Add where
+
+import Prelude.bug
+
+{-
+    correct method for typechecking this definition:
+    1. we assume that `+&#39; is of type Int -&gt; Int -&gt; Int or equivalent
+    2. we can think of the expression as ((+ 5) &quot;foo&quot;)
+    3. we begin with the whole expression, detect that it&#39;s an application
+       and continue with the left sub-expression
+    4. we now need to infer the type of (+ 5) which is another application,
+       so we continue with the left sub-expression
+    5. `+&#39; is a variable which has type Int -&gt; (Int -&gt; Int) in the context
+    6. 5 is a literal of type Int which matches the parameter of `+&#39;
+    7. (+ 5) is of type Int -&gt; Int
+    8. &quot;foo&quot; is a literal of type String which doesn&#39;t match the expected type Int
+       and there exists no way of unifying these two types
+    9. the expression is therefore incorrectly typed
+-}
+
+x = 5 + &quot;foo&quot;</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Add_must_fail</td><td>pass</td><td>cannot unify: Num ?refresha_2010 and String in x</td></tr><tr><td><h4>DiffMeansEstim1</h4></td><td>672 ms</td><td><a onclick="$('#DiffMeansEstim1').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DiffMeansEstim1" style="display: none;"><td colspan="3"><pre>module DiffMeansEstim where
+
+import Distributions.bug
+
+samples = 5000
+
+myPriorMean = normal 0.0 1.0
+myPriorDiff = uniform (-0.5) 0.5
+
+diffmeans pmean pdiff = prob
+    mean ~ pmean
+    diff ~ pdiff
+    rvar ~ gamma 1 1
+    xs ~ repeat 50 $ normal mean rvar
+    ys ~ repeat 50 $ normal (mean+diff) rvar
+    return $ foo =&gt;xs; bar =&gt; ys
+
+diffmeans2 &lt;* updateS (diffmeans myPriorMean myPriorDiff) $ return $ mean=&gt; 0.5;diff=&gt;0.3;rvar=&gt;0.1
+
+diffmeans1 = diffmeans myPriorMean myPriorDiff
+
+diffmeans3 &lt;* updateS diffmeans1 $ return $ mean=&gt; 0.5;diff=&gt;0.3;rvar=&gt;0.1
+
+fakedata &lt;* sample diffmeans2
+
+pars &lt;* estimateStan (diffmeans myPriorMean myPriorDiff) fakedata
+
+assert_mean_pos = Always (with pars $ mean &gt; 0.0)
+
+assert_diff_pos = Mostly (with pars $ diff &gt; 0.1)</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>True,True,True,True,True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_diff_pos</td><td>pass</td><td>100%</td></tr><tr><td><h4>RegressEstim3</h4></td><td>5107 ms</td><td><a onclick="$('#RegressEstim3').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressEstim3" style="display: none;"><td colspan="3"><pre>module RegressEstim where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = prob
+    beta_0 ~ improper_uniform
+    beta_age ~ improper_uniform
+    beta_male ~ improper_uniform
+    beta_salaryhr ~ improper_uniform
+    variance ~ gamma 1 1
+    repeat 50 $ prob
+       age ~ improper_uniform
+       male ~ bernoulli 0.5
+       salaryhr ~ binomial 50 0.5
+       height ~ normal (((beta_0+(age*beta_age))+((boolToReal male)*beta_male))+((unround salaryhr)*beta_salaryhr)) variance
+       return $ (height=&gt;height);((age=&gt;age);((male=&gt;male);(salaryhr=&gt;salaryhr)))
+
+regress2 = prob
+    beta_0 ~ improper_uniform
+    beta_age ~ improper_uniform
+    beta_male ~ improper_uniform
+    beta_salaryhr ~ improper_uniform
+    variance ~ gamma 1 1
+    repeat 50 $ prob
+       age ~ any
+       male ~ any
+       salaryhr ~ any
+       height ~ normal (((beta_0+(age*beta_age))+((boolToReal male)*beta_male))+((unround salaryhr)*beta_salaryhr)) variance
+       return $ (height=&gt;height);((age=&gt;age);((male=&gt;male);(salaryhr=&gt;salaryhr)))
+
+regress1 = prob
+    repeat 50 $ prob
+       age ~ normal 30 5
+       male ~ bernoulli 0.5
+       salaryhr ~ binomial 50 0.5
+       height ~ normal (((4.0+(age*2.0))+((boolToReal male)*0.0))+((unround salaryhr)*0.5)) 1.0
+       return $ (height=&gt;height);(age=&gt;age);(male=&gt;male);(salaryhr=&gt;salaryhr);(name=&gt;&quot;foo&quot;)
+
+fakedata &lt;* sample regress1
+
+pars &lt;* estimateStan regress fakedata
+
+pars2 &lt;* estimateStan regress2 fakedata
+
+assert_slope_posterior = Mostly (with pars $ beta_age &gt; 0.5)
+assert_slope_posterior2 = Mostly (with pars2 $ beta_age &gt; 0.5)
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_slope_posterior</td><td>pass</td><td>100%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_slope_posterior2</td><td>pass</td><td>100%</td></tr><tr><td><h4>RegressEstim1</h4></td><td>511 ms</td><td><a onclick="$('#RegressEstim1').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressEstim1" style="display: none;"><td colspan="3"><pre>module RegressEstim where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = prob
+   offset  ~  normal 0 1.0
+   sigma   ~  gamma 1 1
+   slope   ~  normal 0.0 1.0
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (offset+slope*w) sigma
+                     return $ w=&gt;w;y=&gt;y
+
+regress1 = 
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (1*w-0.5) 0.1
+                     return $ w=&gt;w;y=&gt;y;foo=&gt;3.1
+
+fakedata &lt;* sample regress1
+
+pars &lt;* estimateStan regress fakedata
+
+assert_mean_pos = Mostly (with pars $ slope &gt; 0.5)
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>100%</td></tr><tr><td><h4>RegressEstim2</h4></td><td>1298 ms</td><td><a onclick="$('#RegressEstim2').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RegressEstim2" style="display: none;"><td colspan="3"><pre>module RegressEstim where
+
+import Distributions.bug
+
+samples = 10000
+
+regress = prob
+   offset  ~  normal 0 1.0
+   sigma   ~  gamma 1 1
+   slope   ~  normal 0.0 1.0
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     z ~ normal 0 0.05
+                     y ~ normal (offset+slope*w+z) sigma
+                     return $ w=&gt;w;y=&gt;y;z=&gt;z
+
+regress1 = 
+   repeat 50  $ prob w ~ uniform 0.0 1.0
+                     y ~ normal (1*w-0.5) 0.1
+                     return $ w=&gt;w;y=&gt;y;foo=&gt;3.1
+
+fakedata &lt;* sample regress1
+
+pars &lt;* estimateStan regress fakedata
+
+assert_slope_posterior = Mostly (with pars $ slope &gt; 0.5)
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_slope_posterior</td><td>pass</td><td>100%</td></tr><tr><td><h4>DiffMeansEstim</h4></td><td>687 ms</td><td><a onclick="$('#DiffMeansEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DiffMeansEstim" style="display: none;"><td colspan="3"><pre>module DiffMeansEstim where
+
+import Distributions.bug
+
+samples = 5000
+
+diffmeans = prob
+    mean ~ uniform 0.0 1.0
+    diff ~ uniform (-0.5) 0.5
+    rvar ~ gamma 1 1
+    xs ~ repeat 50 $ normal mean rvar
+    ys ~ repeat 50 $ normal (mean+diff) rvar
+    return $ foo =&gt;xs; bar =&gt; ys
+
+diffmeans1 &lt;* updateS diffmeans $ return $ mean=&gt; 0.5;diff=&gt;0.3;rvar=&gt;0.1
+
+fakedata &lt;* sample diffmeans1
+
+pars &lt;* estimateStan diffmeans fakedata
+
+assert_mean_pos = Always (with pars $ mean &gt; 0.0)
+
+assert_diff_pos = Mostly (with pars $ diff &gt; 0.1)</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mean_pos</td><td>pass</td><td>True,True,True,True,True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_diff_pos</td><td>pass</td><td>100%</td></tr></table></body></html>
