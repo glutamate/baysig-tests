@@ -1,0 +1,1001 @@
+<!DOCTYPE HTML>
+<html><head><title>10May2013_165314</title><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script></head><body><h2>10May2013_165314</h2><table><tr><th>package</th><th>git commit hash</th><th>modified</th></tr><tr><td>baysig-core</td><td>a8e26dea25b53987d4f1e226bd55da88d41e868b
+</td><td></td></tr><tr><td>bugsess</td><td>bb85473f2364deb0b5fdd1c39518e4867b4ecc03
+</td><td></td></tr><tr><td>baysig-exec</td><td>d07ed57b9368c0824464e23d02803d32e3d6788c
+</td><td></td></tr></table><table><tr><td><h4>UnfoldEstim</h4></td><td>334 ms</td><td><a onclick="$('#UnfoldEstim').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="UnfoldEstim" style="display: none;"><td colspan="3"><pre>module UnfoldEstim where
+
+import Distributions.bug
+
+samples = 1000
+
+model = prob
+  v ~ gamma 1 1
+  x0 ~ normal 0 0.1
+  y0 ~ normal 0 0.1
+  ys ~ unfold 100 (x0,y0) $ \(x,y) -&gt; prob
+         z ~ normal x v
+         w ~ normal y v
+	 return (w,z)
+  return $ map fst ys
+
+model1 &lt;* updateS model $ return { v =&gt; 0.1; x0=&gt;0.2; y0 =&gt; -0.5 }
+
+fakeData &lt;* sample model1
+
+--fakeData *&gt; console
+
+pars &lt;* estimateStan model fakeData
+
+assert_unfold_initx = Mostly $ with pars $ x0 &gt; 0
+assert_unfold_inity = Mostly $ with pars $ y0 &lt; 0
+
+pars *&gt; console
+
+--z0 = with pars $ head ys 
+
+--z0 *&gt; console </pre></td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_unfold_initx</td><td>fail</td><td>49.7%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_unfold_inity</td><td>pass</td><td>93%</td></tr><tr><td colspan="3"><h4>DistributionTest</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>type error: Undefined variable: decide</pre></td></tr><tr><td colspan="3"><h4>NestedRegression3</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:1337)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:1350)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:1356)
+    at returnP.pops.mapL.groups.slope (/home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:1366)
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:1519
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:2655
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/NestedRegression3.js:186:2662)
+</pre></td></tr><tr><td colspan="3"><h4>HestonEstim2</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:304)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:317)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:323)
+    at returnP.v (/home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:332)
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:403
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:769
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/HestonEstim2.js:188:776)
+</pre></td></tr><tr><td colspan="3"><h4>LogisticEstim1</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at logitPars.y (/home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:524)
+    at logitPars.y (/home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:537)
+    at logitPars.y (/home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:543)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:553)
+    at /home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:603
+    at /home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:787
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/LogisticEstim1.js:185:794)
+</pre></td></tr><tr><td colspan="3"><h4>NestedRegression1</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:1116)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:1129)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:1135)
+    at returnP.groups.slope (/home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:1145)
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:1277
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:2041
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/NestedRegression1.js:186:2048)
+</pre></td></tr><tr><td><h4>PreludeTests</h4></td><td>139 ms</td><td><a onclick="$('#PreludeTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="PreludeTests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+assert_fac3 = fac 3 == 6
+
+assert_pairs0 = 2 == fst (2,3)
+assert_pairs1 = 3 == snd (2,3)
+
+assert_case = case 1 of
+        0 -&gt; False
+        1 -&gt; True
+
+assert_case1 = case 1 of
+        0 -&gt; False
+        _ -&gt; True
+
+assert_case2 = case 1 of
+        0 -&gt; False
+        x -&gt; True
+
+assert_case3 = not $ case 0 of
+        0 -&gt; False
+        x -&gt; True
+
+f x = 2 * x + 1
+
+lst = Cons 5.3 $ Cons 2.1 Nil
+
+nothing_to_see = let &lt;x,y,z&gt; = fillV 3 (\i-&gt; unround i)
+	       	 in ()
+
+--ASSERT_TYPE lst (List Real)
+
+assert_fhead = between 10 12 $ f $ head lst
+
+assert_bool1 = (True &amp;&amp; False) || (True || False)
+
+assert_bool2 = not $ (True &amp;&amp; False) || (True &amp;&amp; False)
+
+assert_cmp = if ((f $ head lst) &gt; 10) then True else False
+
+assert_negative = -5 &lt; 0
+
+assert_length1 = length lst == 2
+
+lst_lit = [6.2, 4.5, 8.9]
+
+map_lst_lit = map (\x-&gt; x+1) lst_lit
+
+assert_length2 = length lst_lit == 3
+
+assert_length3 = length (take 2 lst_lit) == 2
+
+assert_length5 = length (drop 2 lst_lit) == 1
+
+assert_length4 = length lst_lit == 3
+
+
+
+assert_litlist1 = between 6 7 $ ix 0 lst_lit
+assert_litlist2 = between 8 9 $ ix 2 lst_lit
+assert_litlist3 = between 8 9 $ ix 1 $ drop 1 lst_lit
+
+assert_litlist1_map = between 7 8 $ ix 0 map_lst_lit
+assert_litlist2_map = between 9 10 $ ix 2 map_lst_lit
+
+llpat = let [x,y] = lst
+        in x
+
+assert_list_lit_pattern = between 5 6 llpat
+
+rng = fromTo 1 10
+
+scanned = scanl (\x-&gt; \y-&gt; x+y) 0 rng
+
+assert_scanl_length = length scanned == 11
+
+assert_scanl_val = between 44 46 $ ix 9 scanned 
+
+--the mere definition of these makes the test suite loop forever. not good. 
+--commenting out pred-prey code fixes this. 
+--wierd interaction between mutually recursive functions and ODEs
+--FIXME
+
+--myeven 0 = True
+--myeven n =  myodd (n-1)
+
+--myodd 0 = False
+--myodd n = myeven (n-1)
+
+
+
+--simple distributions
+
+fixdist = prob
+  x ~ return (4:Int)
+  y ~ return 5
+  return (x + y)
+
+fixdist1 = prob
+  x ~ return (4:Int)
+  y ~ return 5
+  w = x + y
+  return (w + y)
+
+nestedDo = prob
+  x ~ prob 
+    z ~ unit
+    return z
+  return $ x+1
+
+fixdistSam &lt;* sample $ fmap (\w-&gt;w&gt;6) fixdist
+fixdist1Sam &lt;* sample $ fmap (\w-&gt;w&gt;10) fixdist1
+nestedDoSam &lt;* sample $ fmap (\w-&gt;w&gt;1.0) nestedDo
+
+assert_fixdist = fixdistSam
+assert_fixdist1 = fixdist1Sam
+assert_nestedDo = nestedDoSam
+
+
+
+wdist = return {xr =&gt; 2 }
+
+wdistSam &lt;* sample $ with wdist (between 1 3 xr) 
+assert_with = wdistSam
+
+repeatDist = repeat 10 $ unit
+
+repeated &lt;* sample repeatDist
+
+assert_repeat_map 
+   = let v = ix 5 (map (\x-&gt; 1.0+x) repeated) 
+     in v &gt; 1.0 &amp;&amp; v &lt; 2.0
+
+assert_repeat_length = length repeated == 10
+
+-- repeatDist -&gt; repeated : loops forever or a long time FIXME. should go in type_must_fail.
+assert_repeat_different = Mostly $ fmap (\xs-&gt; abs(ix 5 xs - ix 6 xs) &gt; 0.05) repeatDist
+
+
+-- records
+
+--ASSERT_TYPE rec1 {foo: Int; bar: String}
+
+rec1 = {foo=&gt;(5:Int); bar=&gt;&quot;foo&quot;}
+
+assert_rec_access1 = rec1#foo &gt; 4
+
+
+
+rec2 = {baz=&gt;True}
+--doesnt work for now: rec2 = rec1;baz=&gt;True or rec2 = baz=&gt;True;rec1
+
+assert_rec_access2= rec2#baz
+
+rec1foo = let {..} = rec1
+	  in foo
+
+assert_rec1_wild = between 4 6 rec1foo
+
+
+--ASSERT_TYPE rec3 {foo: Real; bar: String; zoo: Real-&gt; Real}
+
+rec3 = {foo=&gt;5.5; bar=&gt;&quot;foo&quot;; zoo=&gt; \x-&gt;1.1+x }
+
+assert_rec_access3 = rec3#foo &gt; 4
+
+assert_rec_access4 = rec3 # &quot;foo&quot; &gt; 4
+
+
+--implicit parameters
+
+
+fimpl foo? bar = foo+(bar:Int)
+
+impl_res = let foo = 2
+           in fimpl 5
+
+assert_implicit_params = impl_res == 7
+	 
+
+pair_num_list = (3, [5])
+
+assert_pair_num_list = fst pair_num_list == 3
+
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_lst</td><td>pass</td><td>List Real</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_rec1</td><td>pass</td><td>{foo:Int, bar:String}</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_rec3</td><td>pass</td><td>{foo:Real, bar:String, zoo:Real -&gt; Real}</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fac3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pairs0</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pairs1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fhead</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_bool1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_bool2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_cmp</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_negative</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist1_map</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist2_map</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_list_lit_pattern</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_scanl_length</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_scanl_val</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_repeat_different</td><td>pass</td><td>92.2%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pair_num_list</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec_access1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec_access2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec1_wild</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec_access3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rec_access4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_implicit_params</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fixdist</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fixdist1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_nestedDo</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_with</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_repeat_map</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_repeat_length</td><td>pass</td><td>True</td></tr><tr><td><h4>RecursiveTests</h4></td><td>119 ms</td><td><a onclick="$('#RecursiveTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RecursiveTests" style="display: none;"><td colspan="3"><pre>module RecursiveTests where
+
+import Prelude.bug
+
+
+myeven 0 = True
+myeven n =  myodd (n-1)
+
+myodd 0 = False
+myodd n = myeven (n-1)
+
+myeven1 0 = True
+myeven1 n =  myodd1 (n-1)
+
+myodd1 0 = False
+myodd1 n = myeven1 (n-1)
+
+
+assert_even_4 = myeven 4
+assert_even1_4 = myeven1 4
+assert_odd_5 = myodd 5
+assert_odd1_5 = myodd 5
+assert_noteven_5 = not $ myeven 5
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_even_4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_even1_4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_odd_5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_odd1_5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_noteven_5</td><td>pass</td><td>True</td></tr><tr><td colspan="3"><h4>RegressLarge</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:734)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:747)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:753)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:762)
+    at /home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:825
+    at /home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:1065
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressLarge.js:186:1072)
+</pre></td></tr><tr><td><h4>ParserTest</h4></td><td>120 ms</td><td><a onclick="$('#ParserTest').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="ParserTest" style="display: none;"><td colspan="3"><pre>module ParserTest where
+
+import Prelude.bug
+
+
+xs = [1.1,2.2,3.3,4.4,5.5]
+
+res = runP xs $ bindP headP $ \x0 -&gt; bindP (takeP 2) $ \l1-&gt; bindP (takeP 3) $ \l2-&gt; returnP {foo=&gt;l1;bar=&gt;l2;baz=&gt;x0}
+
+assert_lst_parse_take = length (res#foo) == 2
+
+assert_lst_parse_num = between 1.0 1.2 (res#baz)</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_lst_parse_take</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_lst_parse_num</td><td>pass</td><td>True</td></tr><tr><td colspan="3"><h4>HestonEstim</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:305)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:318)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:324)
+    at returnP.v (/home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:333)
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:404
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:770
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/HestonEstim.js:186:777)
+</pre></td></tr><tr><td><h4>ODETests</h4></td><td>118 ms</td><td><a onclick="$('#ODETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="ODETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+--ODEs
+
+dt = 0.005
+tmax = 1.1
+
+mysig_0 = 1.0
+
+D mysig t = sin (mysig t)
+
+assert_ode = between 1.9 2.0 $ mysig 1.0
+
+rvalpha   = 0.1
+rvbeta    = 0.01
+rvgamma   = 0.05
+rvdelta   = 0.001
+prey_0      = 50.0 
+pred_0      = 15
+D prey t    =     prey t    * (rvalpha  - rvbeta   * pred t) 
+D pred t    =  -  pred t    * (rvgamma  - rvdelta  * prey t)
+
+assert_prey = between 47 48 $ prey 1.0
+assert_pred = between 14.5 15.5 $ pred 1.0
+
+s3 = let zz_0 = 1.0
+         D zz = \t -&gt; sin t
+     in zz
+
+s4 = let v_0 = -0.07
+         w_0 = 0.0
+         D v = \t -&gt; 0.01 * v t -  w t
+         D w = \t -&gt; 0.3 *  w t - v t
+     in v 
+
+assert_let_odes = s4 1.0 &lt; 0 
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_ode</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_let_odes</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_prey</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pred</td><td>pass</td><td>True</td></tr><tr><td><h4>SDETests</h4></td><td>2932 ms</td><td><a onclick="$('#SDETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="SDETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Distributions.bug
+
+dt = 0.005
+tmax = 2.1
+
+
+w2 = prob
+       w ~ wiener
+       return (w 2.0)
+
+assert_wiener_var2 = SamplerDensity (w2) (normalLogPdf 0 2)
+
+w3 = prob
+       w ~ wiener
+       s_0 = 1
+       d s t = 0 + d w t
+       return (s 2.0)
+
+assert_sde_dist = SamplerDensity (w3) (normalLogPdf 1 2)
+
+w4 = prob
+       w ~ wiener
+       s_0 = 0
+       d s t = - s t + d w t
+       return (s 2.0)
+
+
+assert_ou_dist = SamplerDensity (w4) (normalLogPdf 0 0.5) -- ?
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_wiener_var2</td><td>pass</td><td>-4.418658668904647,-4.321932364050271,-4.08958418536805,-3.974441914503789,-3.706039849822784</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_sde_dist</td><td>pass</td><td>-2.9739502274803877,-2.836847391894845,-2.8038685587581758,-2.39895111325049,-2.379560480697564</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_ou_dist</td><td>pass</td><td>-1.8433973812194544,-1.6797496074335307,-1.633847614623897,-1.5168088824002903,-1.4731383046559965</td></tr><tr><td colspan="3"><h4>LogisticEstim</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at logitPars.y (/home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:525)
+    at logitPars.y (/home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:538)
+    at logitPars.y (/home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:544)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:554)
+    at /home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:604
+    at /home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:788
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/LogisticEstim.js:185:795)
+</pre></td></tr><tr><td colspan="3"><h4>WishList</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>parse error: parse error in WishList.bug: (line 5, column 0):
+unexpected Op &quot;=&quot; at (14,5)
+expecting operator</pre></td></tr><tr><td><h4>DensityTests</h4></td><td>440 ms</td><td><a onclick="$('#DensityTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="DensityTests" style="display: none;"><td colspan="3"><pre>{-
+TEST_COMPILER_ONLY
+-}
+
+module DensityTests where
+
+import Distributions.bug
+
+assert_normal_sampler_pdf1 = SamplerDensity (normal 0 1) (normalLogPdf 0 1)
+--assert_normal_sampler_pdf3 = SamplerDensity (normal 1 10) (normalLogPdf 1 10)
+--assert_normal_sampler_pdf5 = SamplerDensity (normal 10 1) (normalLogPdf 10 1)
+--assert_unormal_sampler_pdf = SamplerDensity (unormal) (normalLogPdf 0 1)
+
+
+assert_uniform_sampler_pdf1 = SamplerDensity (uniform 5 10) (uniformLogPdf 5 10)
+
+assert_lognormal_pdf = SamplerDensity (logNormal 1 1) (logNormalLogPdf 1 1)
+assert_gamma_pdf1 = SamplerDensity (gamma 1 2.0) (gammaLogPdf 1 2.0)
+assert_gamma_pdf2 = SamplerDensity (gamma 9 0.5) (gammaLogPdf 9 0.5)
+
+assert_invgamma_pdf1 = SamplerDensity (invGamma 1 1)   (invGammaLogPdf 1 1)
+assert_invgamma_pdf2 = SamplerDensity (invGamma 3 0.5) (invGammaLogPdf 3 0.5)
+
+
+--this should really be in distributiontests
+
+rwalks = unfold 20 0 $ \x -&gt; normal x 1
+
+assert_unfold_length = Always $ fmap (\xs -&gt; length xs == 20) rwalks
+
+diffix ix1 ix2 xs = abs (ix ix2 xs - ix ix1 xs)
+
+assert_rwalk = Mostly $ fmap (\xs -&gt; diffix 18 17 xs &lt; diffix 18 0 xs) rwalks
+
+rw &lt;* sample rwalks
+
+rw *&gt; console</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_normal_sampler_pdf1</td><td>pass</td><td>-3.0557755485815568,-2.8728545498332467,-2.7287293219965902,-2.681398173929685,-2.4821244155093725</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_uniform_sampler_pdf1</td><td>pass</td><td>5.004877105820924,5.023671030066907,5.031744274310768,5.043005861807615,5.052074937848374</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_lognormal_pdf</td><td>pass</td><td>0.1457065465850905,0.17229175727416116,0.23283873978292055,0.2551448061208246,0.2679703395690261</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_unfold_length</td><td>pass</td><td>True,True,True,True,True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_rwalk</td><td>pass</td><td>88.4%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_gamma_pdf1</td><td>pass</td><td>0.016601756385584077,0.024300151656332956,0.02958480389822129,0.03187803742244001,0.0329382964011306</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_gamma_pdf2</td><td>pass</td><td>1.1418178605058336,1.4538252753358656,1.5461800453222725,1.5894469317634152,1.6837621243888512</td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_invgamma_pdf1</td><td>fail</td><td>p=0; 0.11542339061050272,0.14640134057877568,0.1553840830987597,0.1946531590067768,0.20031453068554606</td></tr><tr style="background-color: rgb(255, 220, 220);"><td>assert_invgamma_pdf2</td><td>fail</td><td>p=0; 0.03627868218125052,0.049141831669826025,0.05298041007350869,0.05449982337872094,0.056917697949911764</td></tr><tr><td colspan="3"><h4>CovEstim</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.final0_d0 (/home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:423)
+    at pars.final0_d0 (/home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:436)
+    at pars.final0_d0 (/home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:442)
+    at returnP.cov (/home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:452)
+    at /home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:515
+    at /home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:849
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/CovEstim.js:187:856)
+</pre></td></tr><tr><td colspan="3"><h4>RegressEstim</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:734)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:747)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:753)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:763)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:826
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:1066
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstim.js:186:1073)
+</pre></td></tr><tr><td colspan="3"><h4>NestedRegression</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:872)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:885)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:891)
+    at returnP.groups.slope (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:901)
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:1033
+    at /home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:1797
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/NestedRegression.js:186:1804)
+</pre></td></tr><tr><td colspan="3"><h4>RegressEstimImproper</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:734)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:747)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:753)
+    at returnP.beta_y (/home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:763)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:829
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:1072
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstimImproper.js:186:1079)
+</pre></td></tr><tr><td><h4>NotDefined</h4></td><td>0 ms</td><td><a onclick="$('#NotDefined').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="NotDefined" style="display: none;"><td colspan="3"><pre>module NotFound where
+
+import Prelude.bug
+
+x = notDefinedAnyWhere + 1
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>NotDefined_must_fail</td><td>pass</td><td>Undefined variable: notDefinedAnyWhere</td></tr><tr><td colspan="3"><h4>HestonEstim1</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v4; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v4; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:473)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:486)
+    at pars.s_0 (/home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:492)
+    at returnP.mu (/home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:501)
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:572
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:829
+    at /home/tomn/baysig-exec/tests/asserts/HestonEstim1.js:186:836
+</pre></td></tr><tr><td colspan="3"><h4>LogisticCook</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v2; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at logisticQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:585)
+    at logisticQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:598)
+    at logisticQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:604)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:614)
+    at /home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:664
+    at /home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:848
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/LogisticCook.js:188:855)
+</pre></td></tr><tr><td colspan="3"><h4>OU</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.v_0 (/home/tomn/baysig-exec/tests/asserts/OU.js:186:305)
+    at pars.v_0 (/home/tomn/baysig-exec/tests/asserts/OU.js:186:318)
+    at pars.v_0 (/home/tomn/baysig-exec/tests/asserts/OU.js:186:324)
+    at returnP.eta (/home/tomn/baysig-exec/tests/asserts/OU.js:186:333)
+    at /home/tomn/baysig-exec/tests/asserts/OU.js:186:381
+    at /home/tomn/baysig-exec/tests/asserts/OU.js:186:591
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/OU.js:186:598)
+</pre></td></tr><tr><td colspan="3"><h4>DiffMeansCook</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at diffmeansQuantiles_estimpars_0.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:692)
+    at diffmeansQuantiles_estimpars_0.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:705)
+    at diffmeansQuantiles_estimpars_0.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:711)
+    at returnP.rvar (/home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:720)
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:789
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:1017
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansCook.js:189:1024
+</pre></td></tr><tr><td colspan="3"><h4>RegressCook</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:582)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:595)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:601)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:611)
+    at /home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:674
+    at /home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:914
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressCook.js:189:921)
+</pre></td></tr><tr><td><h4>Update</h4></td><td>126 ms</td><td><a onclick="$('#Update').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Update" style="display: none;"><td colspan="3"><pre>module Update where
+
+import Distributions.bug
+
+upsampler = prob
+   mean ~ uniform 3 4
+   return mean
+
+upsampler1 &lt;* updateS upsampler $ return { mean=&gt; 1}
+
+upsample &lt;* sample upsampler1
+
+assert_update = between 0.5 1.5 upsample
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_update</td><td>pass</td><td>True</td></tr><tr><td><h4>Constructor</h4></td><td>0 ms</td><td><a onclick="$('#Constructor').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Constructor" style="display: none;"><td colspan="3"><pre>module Constructor where
+
+import Prelude.bug
+
+x = Cons 5 $ Cons &quot;foo&quot; Nil</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Constructor_must_fail</td><td>pass</td><td>cannot unify: String and Num ?vint_2783 in x</td></tr><tr><td colspan="3"><h4>RegressDVarCook</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v4; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v4; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:582)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:595)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:601)
+    at returnP.slope1 (/home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:611)
+    at /home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:688
+    at /home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:931
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressDVarCook.js:189:938)
+</pre></td></tr><tr><td><h4>BugsessTest</h4></td><td>126 ms</td><td><a onclick="$('#BugsessTest').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="BugsessTest" style="display: none;"><td colspan="3"><pre>module BugsessTest where
+
+import Prelude.bug
+
+--ASSERT_TYPE five Int
+
+five &lt;* fetch &quot;testdb/five&quot;
+
+rec &lt;* fetch &quot;testdb/testrec&quot;
+
+rec1 &lt;* fetch &quot;testdb/morerec&quot;
+
+probrec &lt;* fetch &quot;testdb/probrec&quot;
+
+assert_fetch1 = five == 5
+
+--ASSERT_TYPE rec {age: Int; name: String}
+--assert_name = rec#name == &quot;Tom&quot;
+assert_age = rec#age == 35
+assert_age1 = 35 == rec#age
+assert_deep_age = rec1#sub2#zoo#age == 35
+assert_stored_signal = between 0 2 $ (rec1#sub2#baz) 0.2
+
+--ASSERT_TYPE probrec (Prob {foo: Real; bar: Real})
+assert_prob_fetch = Mostly $ with probrec $ foo &lt; 1.0
+
+root &lt;* fetch &quot;testdb/morerec&quot;
+
+assert_root1 = root#sub2#zoo#age == 35
+assert_root2 = #sub2#zoo#age == 35
+assert_root3 = 35 == #sub2#zoo#age 
+assert_root4 = #sub3 &gt; 3 &amp;&amp;  #sub3 &lt; 4 
+
+myMat &lt;* fetch &quot;testdb/amat&quot;
+
+--assert_mat1 = (myMat !! (0,1)) == 1 
+--assert_mat2 = (myMat !! (1,0)) == 2
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_five</td><td>pass</td><td>Int</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_rec</td><td>pass</td><td>{age:Int, name:String}</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_probrec</td><td>pass</td><td>Prob {foo:Real, bar:Real}</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fetch1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_age</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_age1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_deep_age</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_stored_signal</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_prob_fetch</td><td>pass</td><td>80%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_root1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_root2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_root3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_root4</td><td>pass</td><td>True</td></tr><tr><td><h4>Add</h4></td><td>0 ms</td><td><a onclick="$('#Add').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Add" style="display: none;"><td colspan="3"><pre>module Add where
+
+import Prelude.bug
+
+{-
+    correct method for typechecking this definition:
+    1. we assume that `+&#39; is of type Int -&gt; Int -&gt; Int or equivalent
+    2. we can think of the expression as ((+ 5) &quot;foo&quot;)
+    3. we begin with the whole expression, detect that it&#39;s an application
+       and continue with the left sub-expression
+    4. we now need to infer the type of (+ 5) which is another application,
+       so we continue with the left sub-expression
+    5. `+&#39; is a variable which has type Int -&gt; (Int -&gt; Int) in the context
+    6. 5 is a literal of type Int which matches the parameter of `+&#39;
+    7. (+ 5) is of type Int -&gt; Int
+    8. &quot;foo&quot; is a literal of type String which doesn&#39;t match the expected type Int
+       and there exists no way of unifying these two types
+    9. the expression is therefore incorrectly typed
+-}
+
+x = 5 + &quot;foo&quot;</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Add_must_fail</td><td>pass</td><td>cannot unify: Num ?refresha_2780 and String in x</td></tr><tr><td colspan="3"><h4>DiffMeansEstim1</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:647)
+    at pars.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:660)
+    at pars.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:666)
+    at returnP.rvar (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:675)
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:744
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:972
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansEstim1.js:190:979
+</pre></td></tr><tr><td colspan="3"><h4>OUxy</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.v_0 (/home/tomn/baysig-exec/tests/asserts/OUxy.js:188:320)
+    at pars.v_0 (/home/tomn/baysig-exec/tests/asserts/OUxy.js:188:333)
+    at pars.v_0 (/home/tomn/baysig-exec/tests/asserts/OUxy.js:188:339)
+    at returnP.eta (/home/tomn/baysig-exec/tests/asserts/OUxy.js:188:348)
+    at /home/tomn/baysig-exec/tests/asserts/OUxy.js:188:396
+    at /home/tomn/baysig-exec/tests/asserts/OUxy.js:188:606
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/OUxy.js:188:613)
+</pre></td></tr><tr><td colspan="3"><h4>RegressEstim3</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v5; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.height (/home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:1680)
+    at pars.height (/home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:1693)
+    at pars.height (/home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:1699)
+    at returnP.variance (/home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:1709)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:1853
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:2259
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstim3.js:187:2266)
+</pre></td></tr><tr><td><h4>VecMatTests</h4></td><td>117 ms</td><td><a onclick="$('#VecMatTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="VecMatTests" style="display: none;"><td colspan="3"><pre>module VecMatTests where
+
+import Prelude.bug
+
+m = fillM (10,10) $ \(i,j) -&gt; unround i * unround j
+
+v = fillV 5 $ \i -&gt; unround i +4
+
+assert_vec_dim = dim v == 5
+
+assert_mat_ix = m !! (2,2) &lt; 10.0 
+assert_vec_ix = v ! 2 &lt; 9.0 
+
+m1 = fillM (2,5) $ \(i,j) -&gt; unround i * unround j
+
+assert_mdims = (fst (mdims m1) == 2) &amp;&amp; (snd (mdims m1) == 5)
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_vec_dim</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mat_ix</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_vec_ix</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mdims</td><td>pass</td><td>True</td></tr><tr><td colspan="3"><h4>VectorEstim</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.final0_d0 (/home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:423)
+    at pars.final0_d0 (/home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:436)
+    at pars.final0_d0 (/home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:442)
+    at returnP.sigma (/home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:452)
+    at /home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:528
+    at /home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:749
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/VectorEstim.js:186:756)
+</pre></td></tr><tr><td colspan="3"><h4>RegressEstim1</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:713)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:726)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:732)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:742)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:805
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:1045
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstim1.js:186:1052)
+</pre></td></tr><tr><td colspan="3"><h4>RegressEstim2</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:714)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:727)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:733)
+    at returnP.final0.mapL.z (/home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:743)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:815
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:1198
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstim2.js:186:1205)
+</pre></td></tr><tr><td colspan="3"><h4>DiffMeansEstim</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:646)
+    at pars.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:659)
+    at pars.final1 (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:665)
+    at returnP.rvar (/home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:674)
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:743
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:971
+    at /home/tomn/baysig-exec/tests/asserts/DiffMeansEstim.js:186:978
+</pre></td></tr><tr><td colspan="3"><h4>CoinBias</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v1; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v1; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.final0 (/home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:393)
+    at pars.final0 (/home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:406)
+    at pars.final0 (/home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:412)
+    at returnP.bias (/home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:422)
+    at /home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:453
+    at /home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:575
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/CoinBias.js:185:582)
+</pre></td></tr><tr><td colspan="3"><h4>RegressEstim4</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:734)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:747)
+    at pars.y (/home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:753)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:763)
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:826
+    at /home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:1066
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressEstim4.js:186:1073)
+</pre></td></tr><tr><td colspan="3"><h4>RegressCook1</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>runtime error: 
+/home/tomn/node_modules/exec-sync/bin/index.js:68
+        throw new Error(error);
+              ^
+Error: 
+Exception: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+Diagnostic information: 
+Dynamic exception type: std::runtime_error
+std::exception::what: variable does not exist; processing stage=data initialization; variable name=N_v3; base type=int
+
+    at module.exports (/home/tomn/node_modules/exec-sync/bin/index.js:68:15)
+    at /home/tomn/baysig-exec/Baysig/Estimate/estimate.js:27:5
+    at vec (/home/tomn/baysig-core/Baysig/JsBackend/trans.js:18:12)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:834)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:847)
+    at regressQuantiles_estimpars_0.y (/home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:853)
+    at returnP.slope (/home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:863)
+    at /home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:926
+    at /home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:1166
+    at Object.&lt;anonymous&gt; (/home/tomn/baysig-exec/tests/asserts/RegressCook1.js:189:1173)
+</pre></td></tr></table></body></html>
