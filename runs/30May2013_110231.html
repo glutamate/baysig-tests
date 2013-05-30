@@ -1,0 +1,395 @@
+<!DOCTYPE HTML>
+<html><head><title>30May2013_110231</title><link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script><script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script></head><body><div class="container"><div class="row"><div class="span12"><h3>Baysig test run #30May2013_110231</h3><table class="table table-condensed"><tr><th>package</th><th>git commit hash</th><th>modified</th></tr><tr><td>baysig-core</td><td>e81e4af74dc77c74f6106d6f29c23eb2567fdc9e
+</td><td>Yes</td></tr></table><table class="table table-condensed"><tr><td colspan="3"><h4>DistributionTest</h4></td></tr><tr style="background-color: rgb(255, 220, 220);"><td colspan="3"><pre>type error: Undefined variable: decide</pre></td></tr><tr><td><h4>PreludeTests</h4></td><td>114 ms</td><td><a onclick="$('#PreludeTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="PreludeTests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+assert_fac3 = fac 3 == 6
+
+assert_pairs0 = 2 == fst (2,3)
+assert_pairs1 = 3 == snd (2,3)
+
+assert_case = case 1 of
+        0 -&gt; False
+        1 -&gt; True
+
+assert_case1 = case 1 of
+        0 -&gt; False
+        _ -&gt; True
+
+assert_case2 = case 1 of
+        0 -&gt; False
+        x -&gt; True
+
+assert_case3 = not $ case 0 of
+        0 -&gt; False
+        x -&gt; True
+
+
+nothing_to_see = let &lt;x,y,z&gt; = fillV 3 (\i-&gt; unround i)
+	       	 in ()
+
+
+--the mere definition of these makes the test suite loop forever. not good. 
+--commenting out pred-prey code fixes this. 
+--wierd interaction between mutually recursive functions and ODEs
+--FIXME
+
+--myeven 0 = True
+--myeven n =  myodd (n-1)
+
+--myodd 0 = False
+--myodd n = myeven (n-1)
+
+
+
+--implicit parameters
+
+
+fimpl foo? bar = foo+(bar:Int)
+
+impl_res = let foo = 2
+           in fimpl 5
+
+assert_implicit_params = impl_res == 7
+	 
+
+pair_num_list = (3, [5])
+
+assert_pair_num_list = fst pair_num_list == 3
+
+--some overloading stuff
+
+myOverLoaded : Num a -&gt; Num a -&gt; Num a
+myOverLoaded x y = x + y + 1
+
+assert_overload1 = between 10 11 $ myOverLoaded 5 4.5
+
+assert_eq1 = (1:Int) == (1:Int)
+assert_eq2 = &quot;foo&quot; == &quot;foo&quot;
+assert_eq3 = True == True
+
+
+
+
+
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fac3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pairs0</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pairs1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_case3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_implicit_params</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pair_num_list</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_overload1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_eq1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_eq2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_eq3</td><td>pass</td><td>True</td></tr><tr><td><h4>RecursiveTests</h4></td><td>122 ms</td><td><a onclick="$('#RecursiveTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="RecursiveTests" style="display: none;"><td colspan="3"><pre>module RecursiveTests where
+
+import Prelude.bug
+
+
+myeven 0 = True
+myeven n =  myodd (n-1)
+
+myodd 0 = False
+myodd n = myeven (n-1)
+
+myeven1 0 = True
+myeven1 n =  myodd1 (n-1)
+
+myodd1 0 = False
+myodd1 n = myeven1 (n-1)
+
+
+assert_even_4 = myeven 4
+assert_even1_4 = myeven1 4
+assert_odd_5 = myodd 5
+assert_odd1_5 = myodd 5
+assert_noteven_5 = not $ myeven 5
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_even_4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_odd_5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_even1_4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_odd1_5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_noteven_5</td><td>pass</td><td>True</td></tr><tr><td><h4>ParserTest</h4></td><td>118 ms</td><td><a onclick="$('#ParserTest').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="ParserTest" style="display: none;"><td colspan="3"><pre>module ParserTest where
+
+import Prelude.bug
+
+
+xs = [1.1,2.2,3.3,4.4,5.5]
+
+res = runP xs $ bindP headP $ \x0 -&gt; bindP (takeP 2) $ \l1-&gt; bindP (takeP 3) $ \l2-&gt; returnP {foo=&gt;l1;bar=&gt;l2;baz=&gt;x0}
+
+assert_lst_parse_take = length (res#foo) == 2
+
+assert_lst_parse_num = between 1.0 1.2 (res#baz)</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_lst_parse_take</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_lst_parse_num</td><td>pass</td><td>True</td></tr><tr><td><h4>ODETests</h4></td><td>114 ms</td><td><a onclick="$('#ODETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="ODETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+--ODEs
+
+dt = 0.005
+tmax = 1.1
+
+mysig_0 = 1.0
+
+D mysig t = sin (mysig t)
+
+assert_ode = between 1.9 2.0 $ mysig 1.0
+
+rvalpha   = 0.1
+rvbeta    = 0.01
+rvgamma   = 0.05
+rvdelta   = 0.001
+prey_0      = 50.0 
+pred_0      = 15
+D prey t    =     prey t    * (rvalpha  - rvbeta   * pred t) 
+D pred t    =  -  pred t    * (rvgamma  - rvdelta  * prey t)
+
+assert_prey = between 47 48 $ prey 1.0
+assert_pred = between 14.5 15.5 $ pred 1.0
+
+s3 = let zz_0 = 1.0
+         D zz = \t -&gt; sin t
+     in zz
+
+s4 = let v_0 = -0.07
+         w_0 = 0.0
+         D v = \t -&gt; 0.01 * v t -  w t
+         D w = \t -&gt; 0.3 *  w t - v t
+     in v 
+
+assert_let_odes = s4 1.0 &lt; 0 
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_ode</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_let_odes</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_prey</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pred</td><td>pass</td><td>True</td></tr><tr><td><h4>SDETests</h4></td><td>2880 ms</td><td><a onclick="$('#SDETests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="SDETests" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Distributions.bug
+
+dt = 0.005
+tmax = 2.1
+
+
+w2 = prob
+       w ~ wiener
+       return (w 2.0)
+
+assert_wiener_var2 = SamplerDensity (w2) (normalLogPdf 0 2)
+
+w3 = prob
+       w ~ wiener
+       s_0 = 1
+       d s t = 0 + d w t
+       return (s 2.0)
+
+assert_sde_dist = SamplerDensity (w3) (normalLogPdf 1 2)
+
+w4 = prob
+       w ~ wiener
+       s_0 = 0
+       d s t = - s t + d w t
+       return (s 2.0)
+
+
+assert_ou_dist = SamplerDensity (w4) (normalLogPdf 0 0.5) -- ?
+
+w5 = prob
+       w ~ wiener
+       s_0 = 1
+       d s t = s t + d w t
+       return (s 2.0)
+
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_wiener_var2</td><td>pass</td><td>-4.511118909332406,-4.432495039048824,-3.4003909815143953,-3.2928412799916686,-3.2614208594227243</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_sde_dist</td><td>pass</td><td>-3.3169540407318205,-2.9588398160060976,-2.9572307702439855,-2.8271763285380196,-2.2725635185930813</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_ou_dist</td><td>pass</td><td>-1.9362007559520324,-1.8069077741385042,-1.7822689520286148,-1.6828559265229754,-1.5623418105002882</td></tr><tr><td><h4>Records</h4></td><td>0 ms</td><td><a onclick="$('#Records').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Records" style="display: none;"><td colspan="3"><pre>module Records where
+
+import Prelude.bug
+
+--f3 : Int -&gt; { a:Int; b:Bool; c:String }
+f3 x = { a=&gt;x; b=&gt;False }
+
+f4 : Int -&gt; { a:Int; b:Bool; c:String }
+f4 x = case x &gt; 0 of
+     True -&gt; { a=&gt;x; b=&gt;False }
+     False -&gt; { a=&gt;x; c=&gt;&quot;neg&quot; } </pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Records_must_fail</td><td>pass</td><td>cannot unify: {a:Int, b:Bool, c:String} and {a:?x_2, c:String} in f4</td></tr><tr><td><h4>List</h4></td><td>114 ms</td><td><a onclick="$('#List').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="List" style="display: none;"><td colspan="3"><pre>module PreludeTest where
+
+import Prelude.bug
+
+lst = Cons 5.3 $ Cons 2.1 Nil
+
+--ASSERT_TYPE lst (List Real)
+
+f x = 2 * x + 1
+
+assert_fhead = between 10 12 $ f $ head lst
+
+assert_bool1 = (True &amp;&amp; False) || (True || False)
+
+assert_bool2 = not $ (True &amp;&amp; False) || (True &amp;&amp; False)
+
+assert_cmp = if ((f $ head lst) &gt; 10) then True else False
+
+assert_negative = -5 &lt; 0
+
+assert_length1 = length lst == 2
+
+lst_lit = [6.2, 4.5, 8.9]
+
+map_lst_lit = map (\x-&gt; x+1) lst_lit
+
+assert_length2 = length lst_lit == 3
+
+assert_length3 = length (take 2 lst_lit) == 2
+
+assert_length5 = length (drop 2 lst_lit) == 1
+
+assert_length4 = length lst_lit == 3
+
+assert_list_filter = length (filter (\x-&gt; x&gt;7) lst_lit) == 1
+assert_list_filter0 = length (filter (\x-&gt; x&gt;7) []) == 0
+
+assert_litlist1 = between 6 7 $ ix 0 lst_lit
+assert_litlist2 = between 8 9 $ ix 2 lst_lit
+assert_litlist3 = between 8 9 $ ix 1 $ drop 1 lst_lit
+
+assert_litlist1_map = between 7 8 $ ix 0 map_lst_lit
+assert_litlist2_map = between 9 10 $ ix 2 map_lst_lit
+
+assert_litlist1_fmap = between 7 8 $ ix 0 $ fmap (\x-&gt; x+1) lst_lit
+assert_litlist2_fmap = between 9 10 $ ix 2 $ fmap (\x-&gt; x+1) lst_lit
+assert_fmap_nil = length (fmap f Nil) == 0
+
+llpat = let [x,y] = lst
+        in x
+
+assert_list_lit_pattern = between 5 6 llpat
+
+rng = fromTo 1 10
+
+scanned = scanl (\x-&gt; \y-&gt; x+y) 0 rng
+
+assert_scanl_length = length scanned == 11
+
+assert_scanl_val = between 44 46 $ ix 9 scanned 
+
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>asserted_type_of_lst</td><td>pass</td><td>List Real</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fhead</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_bool1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_bool2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_cmp</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_negative</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length5</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_length4</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_list_filter</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_list_filter0</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist2</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist3</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist1_map</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist2_map</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist1_fmap</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_litlist2_fmap</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fmap_nil</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_list_lit_pattern</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_scanl_length</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_scanl_val</td><td>pass</td><td>True</td></tr><tr><td><h4>WishList</h4></td><td>109 ms</td><td><a onclick="$('#WishList').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="WishList" style="display: none;"><td colspan="3"><pre>module WishList where
+
+import Prelude.bug
+
+pair_num_list = (3,[5])
+
+assert_pair_num_list = fst pair_num_list == 3
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_pair_num_list</td><td>pass</td><td>True</td></tr><tr><td><h4>Prob</h4></td><td>129 ms</td><td><a onclick="$('#Prob').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Prob" style="display: none;"><td colspan="3"><pre>module ProbTest where
+
+import Prelude.bug
+
+--simple distributions
+
+fixdist = prob
+  x ~ return (4:Int)
+  y ~ return 5
+  return (x + y)
+
+fixdist1 = prob
+  x ~ return (4:Int)
+  y ~ return 5
+  w = x + y
+  return (w + y)
+
+nestedDo = prob
+  x ~ prob 
+    z ~ unit
+    return z
+  return $ x+1
+
+mySamples = Samples [ 10.0,11.2,13.6, 12.1,11.5,10.8]
+--mySamples *&gt; console
+
+d2 = fmap (\w -&gt; w+1) mySamples
+--d2 *&gt; console
+
+d3 = filter (\v -&gt; v&gt;12) mySamples
+
+assert_filter_samples = Always $ fmap (\w-&gt;w&gt;12) d3
+assert_filter_sampler = Always $ fmap (\x-&gt;x&gt;0.5) $ filter (\x-&gt;x&gt;0.5) unit
+
+--TODO: parse error on: 
+--fmap (\w -&gt; w+1) mySamples *&gt; console
+
+assert_fmap_samples = Always $ fmap (\w-&gt;w&gt;6) $ mySamples
+
+fixdistSam &lt;* sample $ fmap (\w-&gt;w&gt;6) fixdist
+fixdist1Sam &lt;* sample $ fmap (\w-&gt;w&gt;10) fixdist1
+nestedDoSam &lt;* sample $ fmap (\w-&gt;w&gt;1.0) nestedDo
+
+assert_fixdist = fixdistSam
+assert_fixdist1 = fixdist1Sam
+assert_nestedDo = nestedDoSam
+
+
+
+wdist = return {xr =&gt; 2 }
+
+wdistSam &lt;* sample $ with wdist (between 1 3 xr) 
+assert_with = wdistSam
+
+repeatDist = repeat 10 $ unit
+
+repeated &lt;* sample repeatDist
+
+assert_repeat_map 
+   = let v = ix 5 (map (\x-&gt; 1.0+x) repeated) 
+     in v &gt; 1.0 &amp;&amp; v &lt; 2.0
+
+assert_repeat_length = length repeated == 10
+
+-- repeatDist -&gt; repeated : loops forever or a long time FIXME. should go in type_must_fail.
+assert_repeat_different = Mostly $ fmap (\xs-&gt; abs(ix 5 xs - ix 6 xs) &gt; 0.05) repeatDist
+
+-- fixP testing
+
+fixUnit &lt;* sample $ fixP 100 unit
+
+--fixThin &lt;* sample $ fixP 10 fixUnit
+
+
+assert_fix_samples 
+  = case countSamples fixUnit of
+      Nothing -&gt; False
+      Just n -&gt; n == 100
+
+{-
+assert_thin_samples 
+  = case countSamples fixThin of
+      Nothing -&gt; False
+      Just n -&gt; n &lt; 50
+-}</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_filter_samples</td><td>pass</td><td>True,True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_filter_sampler</td><td>pass</td><td>True,True,True,True,True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fmap_samples</td><td>pass</td><td>True,True,True,True,True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_repeat_different</td><td>pass</td><td>89.4%</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fixdist</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fixdist1</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_nestedDo</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_with</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_repeat_map</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_repeat_length</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_fix_samples</td><td>pass</td><td>True</td></tr><tr><td><h4>NotDefined</h4></td><td>0 ms</td><td><a onclick="$('#NotDefined').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="NotDefined" style="display: none;"><td colspan="3"><pre>module NotFound where
+
+import Prelude.bug
+
+x = notDefinedAnyWhere + 1
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>NotDefined_must_fail</td><td>pass</td><td>Undefined variable: notDefinedAnyWhere</td></tr><tr><td><h4>Constructor</h4></td><td>0 ms</td><td><a onclick="$('#Constructor').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Constructor" style="display: none;"><td colspan="3"><pre>module Constructor where
+
+import Prelude.bug
+
+x = Cons 5 $ Cons &quot;foo&quot; Nil</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Constructor_must_fail</td><td>pass</td><td>String is not a member of type class Num in x</td></tr><tr><td><h4>Add</h4></td><td>0 ms</td><td><a onclick="$('#Add').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="Add" style="display: none;"><td colspan="3"><pre>module Add where
+
+import Prelude.bug
+
+{-
+    correct method for typechecking this definition:
+    1. we assume that `+&#39; is of type Int -&gt; Int -&gt; Int or equivalent
+    2. we can think of the expression as ((+ 5) &quot;foo&quot;)
+    3. we begin with the whole expression, detect that it&#39;s an application
+       and continue with the left sub-expression
+    4. we now need to infer the type of (+ 5) which is another application,
+       so we continue with the left sub-expression
+    5. `+&#39; is a variable which has type Int -&gt; (Int -&gt; Int) in the context
+    6. 5 is a literal of type Int which matches the parameter of `+&#39;
+    7. (+ 5) is of type Int -&gt; Int
+    8. &quot;foo&quot; is a literal of type String which doesn&#39;t match the expected type Int
+       and there exists no way of unifying these two types
+    9. the expression is therefore incorrectly typed
+-}
+
+x = 5 + &quot;foo&quot;</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>Add_must_fail</td><td>pass</td><td>String is not a member of type class Num in x</td></tr><tr><td><h4>VecMatTests</h4></td><td>116 ms</td><td><a onclick="$('#VecMatTests').toggle();" href="javascript:void(0);">Show/hide code</a></td></tr><tr id="VecMatTests" style="display: none;"><td colspan="3"><pre>module VecMatTests where
+
+import Prelude.bug
+
+m = fillM (10,10) $ \(i,j) -&gt; unround i * unround j
+
+v = fillV 5 $ \i -&gt; unround i +4
+
+assert_vec_dim = dim v == 5
+
+assert_mat_ix = m !! (2,2) &lt; 10.0 
+assert_vec_ix = v ! 2 &lt; 9.0 
+
+m1 = fillM (2,5) $ \(i,j) -&gt; unround i * unround j
+
+assert_mdims = (fst (mdims m1) == 2) &amp;&amp; (snd (mdims m1) == 5)
+</pre></td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_vec_dim</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mat_ix</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_vec_ix</td><td>pass</td><td>True</td></tr><tr style="background-color: rgb(220, 255, 220);"><td>assert_mdims</td><td>pass</td><td>True</td></tr></table></div></div></div></body></html>
